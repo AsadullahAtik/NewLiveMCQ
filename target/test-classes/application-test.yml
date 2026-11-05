@@ -1,0 +1,22 @@
+# Used by SchemaIntegrationTest. Point it at an EMPTY, throw-away database, e.g.
+#   createdb livemcq_test
+#   LIVEMCQ_TEST_DB_URL=jdbc:postgresql://localhost:5432/livemcq_test mvn test
+spring:
+  datasource:
+    url: ${LIVEMCQ_TEST_DB_URL:jdbc:postgresql://localhost:5432/livemcq_test}
+    username: ${LIVEMCQ_TEST_DB_USER:postgres}
+    password: ${LIVEMCQ_TEST_DB_PASSWORD:postgres}
+  flyway:
+    clean-disabled: false
+
+livemcq:
+  jwt:
+    secret: test-only-secret-test-only-secret-1234
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: false
+  # RoleProbeController exists only in the tests; keep it out of the published contract
+  paths-to-exclude: /api/*/_probe

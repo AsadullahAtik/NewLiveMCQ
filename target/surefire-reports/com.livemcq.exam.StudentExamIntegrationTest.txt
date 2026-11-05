@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.livemcq.exam.StudentExamIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.404 s -- in com.livemcq.exam.StudentExamIntegrationTest

@@ -1,0 +1,11 @@
+com\livemcq\domain\ExamTest.class
+com\livemcq\OpenApiContractTest.class
+com\livemcq\exam\MutableClock.class
+com\livemcq\auth\RoleProbeController.class
+com\livemcq\exam\StudentExamIntegrationTest.class
+com\livemcq\exam\ResultIntegrationTest.class
+com\livemcq\SchemaIntegrationTest.class
+com\livemcq\exam\StudentExamIntegrationTest$ClockConfig.class
+com\livemcq\auth\AuthIntegrationTest.class
+com\livemcq\exam\AcademicExamIntegrationTest.class
+com\livemcq\security\JwtServiceTest.class
