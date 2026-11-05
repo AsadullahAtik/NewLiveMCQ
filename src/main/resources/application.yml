@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: livemcq-server
+  autoconfigure:
+    # we authenticate with our own JWT filter; this stops Spring creating a throw-away "user" with a random password
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  datasource:
+    # override with environment variables in real deployments; never commit real passwords
+    url: ${LIVEMCQ_DB_URL:jdbc:postgresql://localhost:5432/livemcq}
+    username: ${LIVEMCQ_DB_USER:postgres}
+    password: ${LIVEMCQ_DB_PASSWORD:postgres}
+  flyway:
+    enabled: true            # applies db/migration/V*.sql on startup
+  jpa:
+    open-in-view: false      # no lazy loading while rendering the HTTP response
+    hibernate:
+      ddl-auto: validate     # Hibernate only CHECKS the schema; Flyway is the only thing that changes it
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+springdoc:
+  # the API description is switched OFF by default (do not advertise your API in production);
+  # the dev and test profiles switch it on
+  api-docs:
+    enabled: ${LIVEMCQ_API_DOCS:false}
+  swagger-ui:
+    enabled: ${LIVEMCQ_API_DOCS:false}
+
+livemcq:
+  jwt:
+    # NO default for the secret on purpose: set LIVEMCQ_JWT_SECRET (32+ characters) or the app will not start.
+    # (the "dev" profile supplies a throw-away one for local work)
+    secret: ${LIVEMCQ_JWT_SECRET:}
+    ttl: 8h
+  cors:
+    # comma-separated list of browser origins allowed to call the API
+    allowed-origins: ${LIVEMCQ_CORS_ORIGINS:http://localhost:3000}

@@ -1,0 +1,2161 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Live MCQ API",
+    "description" : "Exam platform for schools and coaching centres. Log in at POST /api/auth/login, then send the token as 'Authorization: Bearer <token>'.",
+    "version" : "0.1.0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost",
+    "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "bearerAuth" : [ ]
+  } ],
+  "paths" : {
+    "/api/admin/exams/{examId}/questions" : {
+      "put" : {
+        "tags" : [ "Exams (staff)" ],
+        "operationId" : "examAdminReplaceQuestions",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ReplaceQuestionsRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExamDetail"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/student/exams/{examId}/submit" : {
+      "post" : {
+        "tags" : [ "Exams (student)" ],
+        "operationId" : "studentExamSubmit",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SubmitRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SubmitResult"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/student/exams/{examId}/start" : {
+      "post" : {
+        "tags" : [ "Exams (student)" ],
+        "operationId" : "studentExamStart",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PaperView"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "operationId" : "authRegister",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/auth/login" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "operationId" : "authLogin",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/admin/exams" : {
+      "get" : {
+        "tags" : [ "Exams (staff)" ],
+        "operationId" : "examAdminList",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ExamSummary"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Exams (staff)" ],
+        "operationId" : "examAdminCreate",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateExamRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExamDetail"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exams/{examId}/publish" : {
+      "post" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminPublish",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublishResult"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminUnpublish",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublishResult"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exams/{examId}/bonus" : {
+      "post" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminBonus",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BonusRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BonusResult"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/classes" : {
+      "get" : {
+        "tags" : [ "Classes, sections and students" ],
+        "operationId" : "academicClasses",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClassView"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Classes, sections and students" ],
+        "operationId" : "academicCreateClass",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateClassRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClassView"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/classes/{classId}/sections" : {
+      "post" : {
+        "tags" : [ "Classes, sections and students" ],
+        "operationId" : "academicAddSection",
+        "parameters" : [ {
+          "name" : "classId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateSectionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SectionView"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/students/{studentId}/enrollment" : {
+      "patch" : {
+        "tags" : [ "Classes, sections and students" ],
+        "operationId" : "academicMove",
+        "parameters" : [ {
+          "name" : "studentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MoveStudentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StudentView"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/student/leaderboard/overall" : {
+      "get" : {
+        "tags" : [ "Results (student)" ],
+        "operationId" : "resultStudentOverall",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OverallBoard"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/student/exams" : {
+      "get" : {
+        "tags" : [ "Exams (student)" ],
+        "operationId" : "studentExamList",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/StudentExamView"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/student/exams/{examId}/result" : {
+      "get" : {
+        "tags" : [ "Results (student)" ],
+        "operationId" : "resultStudentResult",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MyResult"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/student/exams/{examId}/leaderboard" : {
+      "get" : {
+        "tags" : [ "Results (student)" ],
+        "operationId" : "resultStudentLeaderboard",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Leaderboard"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/institutions/{slug}/classes" : {
+      "get" : {
+        "tags" : [ "Classes, sections and students" ],
+        "operationId" : "academicPublicClasses",
+        "parameters" : [ {
+          "name" : "slug",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClassOption"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ ]
+      }
+    },
+    "/api/auth/me" : {
+      "get" : {
+        "tags" : [ "Auth" ],
+        "operationId" : "authMe",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserView"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/summary" : {
+      "get" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminSummary",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminSummary"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/students" : {
+      "get" : {
+        "tags" : [ "Classes, sections and students" ],
+        "operationId" : "academicStudents",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/StudentView"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/students/{studentId}/report" : {
+      "get" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminReport",
+        "parameters" : [ {
+          "name" : "studentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StudentReport"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exams/{examId}" : {
+      "get" : {
+        "tags" : [ "Exams (staff)" ],
+        "operationId" : "examAdminGet",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExamDetail"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Exams (staff)" ],
+        "operationId" : "examAdminDelete",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exams/{examId}/leaderboard" : {
+      "get" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminLeaderboard",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Leaderboard"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exams/{examId}/attempts/{studentId}" : {
+      "get" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminAnswerSheet",
+        "parameters" : [ {
+          "name" : "examId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "studentId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AnswerSheet"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/classes/{classId}/sections/{sectionId}/students" : {
+      "get" : {
+        "tags" : [ "Results (staff)" ],
+        "operationId" : "resultAdminSectionStudents",
+        "parameters" : [ {
+          "name" : "classId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "sectionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SectionStudents"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Error (see the code field)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "QuestionInput" : {
+        "type" : "object",
+        "properties" : {
+          "body" : {
+            "type" : "string",
+            "maxLength" : 2000,
+            "minLength" : 0
+          },
+          "options" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "maxLength" : 500,
+              "minLength" : 0
+            },
+            "maxItems" : 4,
+            "minItems" : 4
+          },
+          "correctIdx" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 3,
+            "minimum" : 0
+          }
+        },
+        "required" : [ "body", "correctIdx", "options" ]
+      },
+      "ReplaceQuestionsRequest" : {
+        "type" : "object",
+        "properties" : {
+          "questions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QuestionInput"
+            },
+            "maxItems" : 200,
+            "minItems" : 1
+          }
+        },
+        "required" : [ "questions" ]
+      },
+      "ExamDetail" : {
+        "type" : "object",
+        "properties" : {
+          "exam" : {
+            "$ref" : "#/components/schemas/ExamSummary"
+          },
+          "questions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QuestionView"
+            }
+          }
+        },
+        "required" : [ "exam", "questions" ]
+      },
+      "ExamSummary" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "classId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "className" : {
+            "type" : "string"
+          },
+          "durationMinutes" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "marksPerQuestion" : {
+            "type" : "number"
+          },
+          "negativeMarks" : {
+            "type" : "number"
+          },
+          "bonusMarks" : {
+            "type" : "number"
+          },
+          "questionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "baseMarks" : {
+            "type" : "number"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          },
+          "published" : {
+            "type" : "boolean"
+          },
+          "publishedAt" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "attempts" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "attempts", "baseMarks", "bonusMarks", "classId", "className", "durationMinutes", "fullMarks", "id", "marksPerQuestion", "negativeMarks", "published", "questionCount", "title" ]
+      },
+      "QuestionView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "body" : {
+            "type" : "string"
+          },
+          "options" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "correctIdx" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "body", "correctIdx", "id", "options" ]
+      },
+      "SubmitRequest" : {
+        "type" : "object",
+        "properties" : {
+          "answers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int32"
+            }
+          }
+        },
+        "required" : [ "answers" ]
+      },
+      "SubmitResult" : {
+        "type" : "object",
+        "properties" : {
+          "submitted" : {
+            "type" : "boolean"
+          },
+          "timeSec" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "submitted", "timeSec" ]
+      },
+      "PaperQuestion" : {
+        "type" : "object",
+        "properties" : {
+          "body" : {
+            "type" : "string"
+          },
+          "options" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "body", "options" ]
+      },
+      "PaperView" : {
+        "type" : "object",
+        "properties" : {
+          "examId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "durationMinutes" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "marksPerQuestion" : {
+            "type" : "number"
+          },
+          "negativeMarks" : {
+            "type" : "number"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          },
+          "startedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "deadlineAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "serverTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "remainingSeconds" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "questions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PaperQuestion"
+            }
+          }
+        },
+        "required" : [ "deadlineAt", "durationMinutes", "examId", "fullMarks", "marksPerQuestion", "negativeMarks", "questions", "remainingSeconds", "serverTime", "startedAt", "title" ]
+      },
+      "RegisterRequest" : {
+        "type" : "object",
+        "properties" : {
+          "institution" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : "string",
+            "maxLength" : 120,
+            "minLength" : 0
+          },
+          "roll" : {
+            "type" : "string",
+            "maxLength" : 20,
+            "minLength" : 0
+          },
+          "password" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "sectionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "institution", "name", "password", "roll", "sectionId" ]
+      },
+      "InstitutionView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "name", "slug" ]
+      },
+      "LoginResponse" : {
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          },
+          "tokenType" : {
+            "type" : "string"
+          },
+          "expiresInSeconds" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "user" : {
+            "$ref" : "#/components/schemas/UserView"
+          }
+        },
+        "required" : [ "expiresInSeconds", "token", "tokenType", "user" ]
+      },
+      "UserView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "roll" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "ADMIN", "TEACHER", "STUDENT" ]
+          },
+          "institution" : {
+            "$ref" : "#/components/schemas/InstitutionView"
+          },
+          "classId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "className" : {
+            "type" : [ "string", "null" ]
+          },
+          "sectionId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "sectionName" : {
+            "type" : [ "string", "null" ]
+          }
+        },
+        "required" : [ "id", "institution", "name", "role", "roll" ]
+      },
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "institution" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 0
+          },
+          "roll" : {
+            "type" : "string",
+            "maxLength" : 20,
+            "minLength" : 0
+          },
+          "password" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "institution", "password", "roll" ]
+      },
+      "CreateExamRequest" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "classId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "durationMinutes" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 180,
+            "minimum" : 1
+          },
+          "marksPerQuestion" : {
+            "type" : "number",
+            "minimum" : 0
+          },
+          "negativeMarks" : {
+            "type" : "number",
+            "minimum" : 0
+          },
+          "questions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QuestionInput"
+            },
+            "maxItems" : 200,
+            "minItems" : 1
+          }
+        },
+        "required" : [ "classId", "durationMinutes", "marksPerQuestion", "negativeMarks", "questions", "title" ]
+      },
+      "PublishResult" : {
+        "type" : "object",
+        "properties" : {
+          "published" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "published" ]
+      },
+      "BonusRequest" : {
+        "type" : "object",
+        "properties" : {
+          "bonus" : {
+            "type" : "number",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        },
+        "required" : [ "bonus" ]
+      },
+      "BonusResult" : {
+        "type" : "object",
+        "properties" : {
+          "bonus" : {
+            "type" : "number"
+          },
+          "updated" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "bonus", "fullMarks", "updated" ]
+      },
+      "CreateClassRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 80,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "ClassView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "studentCount" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "examCount" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "sections" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SectionView"
+            }
+          }
+        },
+        "required" : [ "examCount", "id", "name", "sections", "studentCount" ]
+      },
+      "SectionView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "studentCount" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "id", "name", "studentCount" ]
+      },
+      "CreateSectionRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 40,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "MoveStudentRequest" : {
+        "type" : "object",
+        "properties" : {
+          "sectionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "sectionId" ]
+      },
+      "StudentView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "roll" : {
+            "type" : "string"
+          },
+          "phone" : {
+            "type" : [ "string", "null" ]
+          },
+          "classId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "className" : {
+            "type" : [ "string", "null" ]
+          },
+          "sectionId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "sectionName" : {
+            "type" : [ "string", "null" ]
+          },
+          "attempts" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "attempts", "id", "name", "roll" ]
+      },
+      "OverallBoard" : {
+        "type" : "object",
+        "properties" : {
+          "className" : {
+            "type" : "string"
+          },
+          "examCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          },
+          "rows" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OverallRow"
+            }
+          }
+        },
+        "required" : [ "className", "examCount", "fullMarks", "rows" ]
+      },
+      "OverallRow" : {
+        "type" : "object",
+        "properties" : {
+          "rank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "roll" : {
+            "type" : "string"
+          },
+          "marks" : {
+            "type" : "number"
+          },
+          "timeSec" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "taken" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "me" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "marks", "me", "name", "rank", "roll", "taken", "timeSec" ]
+      },
+      "StudentExamView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "durationMinutes" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "marksPerQuestion" : {
+            "type" : "number"
+          },
+          "negativeMarks" : {
+            "type" : "number"
+          },
+          "questionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          },
+          "published" : {
+            "type" : "boolean"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "AVAILABLE", "IN_PROGRESS", "SUBMITTED", "EXPIRED", "MISSED" ]
+          },
+          "remainingSeconds" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          }
+        },
+        "required" : [ "durationMinutes", "fullMarks", "id", "marksPerQuestion", "negativeMarks", "published", "questionCount", "status", "title" ]
+      },
+      "ExamInfo" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "className" : {
+            "type" : "string"
+          },
+          "marksPerQuestion" : {
+            "type" : "number"
+          },
+          "negativeMarks" : {
+            "type" : "number"
+          },
+          "bonusMarks" : {
+            "type" : "number"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          },
+          "questionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "published" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "bonusMarks", "className", "fullMarks", "id", "marksPerQuestion", "negativeMarks", "published", "questionCount", "title" ]
+      },
+      "MyResult" : {
+        "type" : "object",
+        "properties" : {
+          "exam" : {
+            "$ref" : "#/components/schemas/ExamInfo"
+          },
+          "score" : {
+            "$ref" : "#/components/schemas/Score"
+          },
+          "rank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "participants" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "review" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReviewItem"
+            }
+          }
+        },
+        "required" : [ "exam", "participants", "rank", "review", "score" ]
+      },
+      "ReviewItem" : {
+        "type" : "object",
+        "properties" : {
+          "body" : {
+            "type" : "string"
+          },
+          "options" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "correctIdx" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "chosenIdx" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          }
+        },
+        "required" : [ "body", "correctIdx", "options" ]
+      },
+      "Score" : {
+        "type" : "object",
+        "properties" : {
+          "marks" : {
+            "type" : "number"
+          },
+          "rawMarks" : {
+            "type" : "number"
+          },
+          "bonus" : {
+            "type" : "number"
+          },
+          "correct" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "wrong" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "blank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "timeSec" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "blank", "bonus", "correct", "marks", "rawMarks", "timeSec", "wrong" ]
+      },
+      "BoardRow" : {
+        "type" : "object",
+        "properties" : {
+          "rank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "userId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "roll" : {
+            "type" : "string"
+          },
+          "marks" : {
+            "type" : "number"
+          },
+          "correct" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "wrong" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "blank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "timeSec" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "me" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "blank", "correct", "marks", "me", "name", "rank", "roll", "timeSec", "wrong" ]
+      },
+      "Leaderboard" : {
+        "type" : "object",
+        "properties" : {
+          "exam" : {
+            "$ref" : "#/components/schemas/ExamInfo"
+          },
+          "participants" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "rows" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BoardRow"
+            }
+          }
+        },
+        "required" : [ "exam", "participants", "rows" ]
+      },
+      "ClassOption" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "sections" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SectionOption"
+            }
+          }
+        },
+        "required" : [ "id", "name", "sections" ]
+      },
+      "SectionOption" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
+      "AdminSummary" : {
+        "type" : "object",
+        "properties" : {
+          "students" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "examCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pending" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ExamSummary"
+            }
+          },
+          "published" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ExamSummary"
+            }
+          }
+        },
+        "required" : [ "examCount", "pending", "published", "students" ]
+      },
+      "ReportRow" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "fullMarks" : {
+            "type" : "number"
+          },
+          "published" : {
+            "type" : "boolean"
+          },
+          "taken" : {
+            "type" : "boolean"
+          },
+          "bonus" : {
+            "type" : "number"
+          },
+          "marks" : {
+            "type" : [ "number", "null" ]
+          },
+          "correct" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "wrong" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "blank" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "timeSec" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "rank" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "participants" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          }
+        },
+        "required" : [ "bonus", "fullMarks", "id", "published", "taken", "title" ]
+      },
+      "ReportSummary" : {
+        "type" : "object",
+        "properties" : {
+          "examCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "taken" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "missed" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "marks" : {
+            "type" : "number"
+          },
+          "full" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "examCount", "full", "marks", "missed", "taken" ]
+      },
+      "StudentRef" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "roll" : {
+            "type" : "string"
+          },
+          "className" : {
+            "type" : [ "string", "null" ]
+          },
+          "sectionName" : {
+            "type" : [ "string", "null" ]
+          }
+        },
+        "required" : [ "id", "name", "roll" ]
+      },
+      "StudentReport" : {
+        "type" : "object",
+        "properties" : {
+          "student" : {
+            "$ref" : "#/components/schemas/StudentRef"
+          },
+          "exams" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReportRow"
+            }
+          },
+          "summary" : {
+            "$ref" : "#/components/schemas/ReportSummary"
+          }
+        },
+        "required" : [ "exams", "student", "summary" ]
+      },
+      "AnswerSheet" : {
+        "type" : "object",
+        "properties" : {
+          "exam" : {
+            "$ref" : "#/components/schemas/ExamInfo"
+          },
+          "student" : {
+            "$ref" : "#/components/schemas/StudentRef"
+          },
+          "score" : {
+            "$ref" : "#/components/schemas/Score"
+          },
+          "rank" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "participants" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "review" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReviewItem"
+            }
+          }
+        },
+        "required" : [ "exam", "participants", "rank", "review", "score", "student" ]
+      },
+      "SectionStudentRow" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "roll" : {
+            "type" : "string"
+          },
+          "phone" : {
+            "type" : [ "string", "null" ]
+          },
+          "taken" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "examCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "marks" : {
+            "type" : "number"
+          }
+        },
+        "required" : [ "examCount", "id", "marks", "name", "roll", "taken" ]
+      },
+      "SectionStudents" : {
+        "type" : "object",
+        "properties" : {
+          "classId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "className" : {
+            "type" : "string"
+          },
+          "sectionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "section" : {
+            "type" : "string"
+          },
+          "examCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "students" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SectionStudentRow"
+            }
+          }
+        },
+        "required" : [ "classId", "className", "examCount", "section", "sectionId", "students" ]
+      },
+      "ApiError" : {
+        "properties" : {
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "status" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "fieldErrors" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "code", "message", "status", "timestamp" ]
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

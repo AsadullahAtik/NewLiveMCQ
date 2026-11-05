@@ -1,0 +1,1554 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Live MCQ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A7396">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Live MCQ">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone-width column (header, scrolling main, 4-tab bar). Motif: an OMR answer sheet, with answer bubbles and timing marks. */
+:root{
+  --bg:#F3F6F9; --surface:#FFFFFF; --ink:#0F1F2A; --muted:#5A6C78; --line:#E2E9EE;
+  --accent:#0A7396; --accent-ink:#FFFFFF; --accent-soft:#E1F1F7; --accent-2:#13A0B8;
+  --shadow:0 1px 2px rgba(15,31,42,.05),0 4px 14px rgba(15,31,42,.06); --shadow-lg:0 10px 30px rgba(15,31,42,.14);
+  --good:#17794A; --good-soft:#DDF1E6; --bad:#B8392B; --bad-soft:#F8E2DE; --warn:#8A5700; --warn-soft:#FBEFD3;
+  --scrim:rgba(8,18,22,.55);
+  --f-display:"Baloo Da 2","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
+  --f-body:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#091217; --surface:#101D24; --ink:#E6EEF2; --muted:#8FA5B0; --line:#1F323B;
+    --accent:#4DBBDC; --accent-ink:#04212A; --accent-soft:#12333F; --accent-2:#2A9DB8;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); --shadow-lg:0 10px 30px rgba(0,0,0,.5);
+    --good:#52C78C; --good-soft:#12352A; --bad:#F0786B; --bad-soft:#3A1E1B; --warn:#E6B54F; --warn-soft:#3A2D10;
+    --scrim:rgba(0,0,0,.65); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#091217; --surface:#101D24; --ink:#E6EEF2; --muted:#8FA5B0; --line:#1F323B;
+  --accent:#4DBBDC; --accent-ink:#04212A; --accent-soft:#12333F; --accent-2:#2A9DB8;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); --shadow-lg:0 10px 30px rgba(0,0,0,.5);
+  --good:#52C78C; --good-soft:#12352A; --bad:#F0786B; --bad-soft:#3A1E1B; --warn:#E6B54F; --warn-soft:#3A2D10;
+  --scrim:rgba(0,0,0,.65); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{height:100%;box-sizing:border-box}
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3,p{margin:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sp{flex:1}
+#app{height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
+
+/* type */
+.h1{font-family:var(--f-display);font-weight:800;font-size:1.9rem;line-height:1.2;text-wrap:balance}
+.h1.xl{font-size:2.4rem;letter-spacing:-.01em}
+.h1.sm{font-size:1.5rem}
+.h2{font-family:var(--f-display);font-weight:700;font-size:1.1rem;line-height:1.3}
+.eyebrow{color:var(--muted);font-weight:500;font-size:.9rem}
+.lead{color:var(--muted);font-size:1.05rem}
+.meta{color:var(--muted);font-size:.9rem}
+.note{color:var(--muted);font-size:.85rem}
+
+/* header, nav */
+.top{display:flex;align-items:center;justify-content:space-between;padding-block:8px}
+.top-r{display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.35rem}
+.mark{color:var(--ink)}
+.timing{height:6px;background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 11px);flex:none}
+.page>*{flex:none}
+.split{display:flex;flex-direction:column;gap:14px}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.col>*{flex:none}
+.cards3{display:flex;flex-direction:column;gap:14px}
+.hdr-name{display:none}
+.auth-l,.auth-r{display:flex;flex-direction:column;gap:18px;min-width:0}
+.main{flex:1;min-height:0;overflow-y:auto;padding-block:16px 14px;-webkit-overflow-scrolling:touch}
+.page{display:flex;flex-direction:column;gap:14px;min-width:0}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;border-top:1px solid var(--line);padding-block:6px 8px;flex:none}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:54px;padding:4px 2px;background:none;border:0;color:var(--muted);font-size:.74rem;font-weight:600;border-radius:12px}
+.tab .ic{padding:3px 16px;border-radius:999px;display:grid;place-items:center}
+.tab.on{color:var(--accent)}
+.tab.on .ic{background:var(--accent-soft)}
+.icon-btn{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+
+/* basics */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:1px 10px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.mute{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:12px;border:1.5px solid transparent;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border-color:var(--line)}
+.btn.danger{background:transparent;border-color:var(--bad);color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:#fff}
+.btn.sm{min-height:40px;padding:0 14px;font-size:.92rem}
+.btn.block{width:100%}
+.btn:disabled{opacity:.55;cursor:default}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.loading,.empty{color:var(--muted);text-align:center;padding:28px 12px}
+.empty{border:1.5px dashed var(--line);border-radius:14px}
+.field{display:grid;gap:6px;min-width:0}
+.field label{font-weight:600;font-size:.9rem}
+input,select,textarea{width:100%;min-height:48px;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+textarea{padding:10px 12px;min-height:72px;resize:vertical}
+form{display:flex;flex-direction:column;gap:12px}
+
+/* OMR bubbles */
+.bubble{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--muted);display:inline-grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:.95rem;line-height:1}
+.bubble.lg{width:46px;height:46px;font-size:1.3rem}
+.bubble.sm{width:26px;height:26px;font-size:.8rem;border-width:1.5px}
+.bubble.fill{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* auth */
+.auth{flex:1;min-height:0;overflow-y:auto;padding-block:24px 28px;display:flex;flex-direction:column;gap:18px}
+.auth-hero{display:flex;flex-direction:column;gap:8px}
+.bubbles{display:flex;gap:10px;margin-bottom:6px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{min-height:44px;border:0;background:transparent;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--accent-soft);color:var(--accent)}
+.foot{color:var(--muted);font-size:.82rem;text-align:center}
+
+/* home / exam cards */
+.hello{display:flex;flex-direction:column;gap:6px}
+.exam h3{font-family:var(--f-display);font-weight:700;font-size:1.15rem;line-height:1.3}
+.exam-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.scoreline{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;color:var(--muted)}
+.scoreline b{font-family:var(--f-display);font-size:1.6rem;color:var(--ink)}
+.scoreline span{margin-left:auto;font-weight:600;color:var(--accent)}
+.pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.pill{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:.9rem;max-width:80%}
+.pill.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile b{font-family:var(--f-display);font-size:1.7rem;line-height:1.1}
+.tile span{color:var(--muted);font-size:.8rem}
+.tile.warn{background:var(--warn-soft);border-color:transparent}
+.tile.warn b,.tile.warn span{color:var(--warn)}
+.btn-card{text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+
+/* leaderboard */
+.board{padding:0;gap:0;overflow:hidden}
+.board-h{padding:14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row.me{background:var(--accent-soft)}
+.rankb{flex:none;width:38px;height:38px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-family:var(--f-body);font-weight:700;line-height:1;font-size:1.05rem}
+.rankb.medal{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.who{flex:1;min-width:0;display:flex;flex-direction:column}
+.who b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who small{color:var(--muted);font-size:.8rem}
+.score{text-align:right;display:flex;flex-direction:column;line-height:1.2}
+.score b{font-family:var(--f-display);font-size:1.2rem}
+.score small{color:var(--muted);font-size:.78rem}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:30;background:var(--bg);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ov-in{height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
+.ov-h{display:flex;align-items:center;gap:10px;padding-block:8px;flex:none}
+.ov-h h2{font-family:var(--f-display);font-weight:700;font-size:1.15rem}
+.ov-body{flex:1;min-height:0;overflow-y:auto;padding-block:10px 18px;display:flex;flex-direction:column;gap:14px}
+.ov-foot{flex:none;padding-block:10px 12px;border-top:1px solid var(--line);display:grid;gap:10px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rules{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;color:var(--ink)}
+
+/* exam taking */
+.ex-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px 8px}
+.ex-top small{color:var(--muted);display:block;font-size:.8rem}
+.ex-top b{font-family:var(--f-display);font-size:1.05rem;line-height:1.3}
+.timer{font-family:var(--f-display);font-weight:800;font-size:1.3rem;padding:2px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.timer.low{background:var(--bad-soft);color:var(--bad)}
+.bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:var(--accent)}
+.qno{color:var(--muted);font-weight:600;font-size:.9rem}
+.qtext{font-size:1.2rem;line-height:1.55;font-weight:500;overflow-wrap:anywhere}
+.qtext.sm{font-size:1rem}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;text-align:left;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface)}
+.opt span:last-child{min-width:0;overflow-wrap:anywhere}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .bubble{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ex-foot{flex:none;border-top:1px solid var(--line);padding-block:10px 12px;display:flex;flex-direction:column;gap:10px}
+.pal{display:flex;flex-wrap:wrap;gap:8px}
+.pb{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-family:var(--f-display);font-weight:700}
+.pb.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pb.cur{border-color:var(--ink);border-width:2.5px}
+.link{background:none;border:0;color:var(--accent);font-weight:600;min-height:40px;text-align:center}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:480px;background:var(--surface);border-radius:18px 18px 0 0;display:flex;flex-direction:column;gap:12px;
+  padding:20px max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
+
+/* result */
+.ring-wrap{display:flex;align-items:center;gap:18px}
+.ring{position:relative;width:132px;height:132px;flex:none}
+.ring svg{width:100%;height:100%}
+.ring-bg{fill:none;stroke:var(--line);stroke-width:8}
+.ring-fg{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round}
+.ring-t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.ring-t b{font-family:var(--f-display);font-size:1.9rem}
+.ring-t small{color:var(--muted)}
+.rfacts{display:flex;flex-direction:column;gap:8px;min-width:0}
+.rfacts div{display:flex;flex-direction:column;line-height:1.3}
+.rfacts small{color:var(--muted);font-size:.8rem}
+.rfacts b{font-family:var(--f-display);font-size:1.25rem}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.calc{font-size:.88rem;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px}
+.rv-h{display:flex;align-items:center;justify-content:space-between}
+.qn{font-family:var(--f-display);font-weight:800;font-size:1.1rem}
+.ro{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1.5px solid transparent}
+.ro>span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}
+.ro .tag{flex:none;font-size:.72rem;font-weight:700}
+.ro.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.ro.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.bigok{width:84px;height:84px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center}
+.center{align-items:center;text-align:center}
+
+/* admin */
+.q-ed{gap:10px}
+.mono{font-family:var(--f-mono);font-size:.82rem}
+.log{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);min-width:0}
+.log .p{flex:1;min-width:0;overflow-wrap:anywhere}
+.m{flex:none;font-family:var(--f-mono);font-weight:700;font-size:.72rem;padding:1px 6px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.m.POST,.m.PATCH{background:var(--warn-soft);color:var(--warn)}
+.m.DELETE{background:var(--bad-soft);color:var(--bad)}
+.stu-sel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addrow{display:flex;gap:8px}
+.addrow input{flex:1;min-width:0}
+
+.secrow{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:left}
+.secrow .who small{display:block}
+.chev{flex:none;color:var(--muted);display:grid;place-items:center}
+.stand{display:flex;align-items:center;gap:14px;background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:14px}
+.stand-rank{flex:none;width:58px;height:58px;border-radius:50%;border:2.5px solid var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:1.6rem;line-height:1}
+.stand-r{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.3}
+.stand-r small{opacity:.9;font-size:.84rem}
+.stand-r b{font-family:var(--f-display);font-size:1.5rem;line-height:1.2}
+.stand-s{display:flex;flex-direction:column;text-align:right;line-height:1.25;flex:none;max-width:42%}
+.stand-s b{font-family:var(--f-display);font-size:1.7rem;line-height:1.1}
+.stand-s small{opacity:.9;font-size:.8rem}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:4px 0 0}
+.pcol{flex:1;min-width:0;max-width:140px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.pcol .nm{font-weight:600;font-size:.86rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px}
+.pcol .mk{font-family:var(--f-display);font-weight:800;font-size:1.2rem;line-height:1.1}
+.pblock{width:100%;border-radius:12px 12px 0 0;background:var(--accent-soft);border:1px solid var(--line);border-bottom:0;display:flex;justify-content:center;padding-top:10px}
+.pcol.first .pblock{background:var(--accent);border-color:var(--accent)}
+.pblock .rankb{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.pcol.me .nm{color:var(--accent)}
+.mbar{display:block;height:5px;border-radius:4px;background:var(--line);margin-top:6px;overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--accent)}
+.row .who small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-weight:700}
+.secrow .who{flex:1;min-width:0}
+.card.board>.secrow{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+.card.board>.secrow:last-child{border-bottom:0}
+.stuline{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:6px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left}
+.stuline:last-of-type{border-bottom:0}
+.stuline .sn{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stuline .sr{flex:none;color:var(--muted);font-size:.82rem}
+.toast{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:min(92vw,440px);padding:10px 16px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:600;font-size:.92rem;text-align:center}
+.toast.good{background:var(--good);color:#fff}
+.toast.bad{background:var(--bad);color:#fff}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .18s ease-out}@keyframes up{from{opacity:0;transform:translate(-50%,8px)}}}
+
+/* ---------- tablet and desktop ---------- */
+@media (hover:hover){
+  .btn-card:hover,.secrow:hover,.stuline:hover,.opt:hover,.pill:hover,.pb:hover,.icon-btn:hover{border-color:var(--accent)}
+  .tab:hover{background:var(--accent-soft)}
+  .btn.ghost:hover{border-color:var(--accent)}
+  .btn.primary:hover{filter:brightness(1.08)}
+}
+@media (min-width:640px) and (max-width:899.98px){
+  #app{max-width:680px}
+  .ov-in{max-width:680px}
+  .opts{gap:12px}
+}
+@media (min-width:900px){
+  #app{max-width:1360px}
+  .hdr-name{display:inline;font-weight:600;color:var(--muted);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .top{padding-block:12px}
+  #app.shell{display:grid;grid-template-columns:240px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"top top" "tim tim" "nav main"}
+  #app.shell>.top{grid-area:top}
+  #app.shell>.timing{grid-area:tim}
+  #app.shell>.main{grid-area:main;padding:28px 12px 32px 40px}
+  #app.shell>.tabs{grid-area:nav;grid-template-columns:1fr;align-content:start;gap:6px;border-top:0;border-right:1px solid var(--line);padding:24px 18px 24px 0}
+  .tab{flex-direction:row;justify-content:flex-start;gap:12px;min-height:50px;padding:0 14px;font-size:1rem;border-radius:12px}
+  .tab .ic{padding:0}
+  .tab.on .ic{background:transparent}
+  .tab.on{background:var(--accent-soft)}
+  .page{max-width:1100px;gap:18px}
+  .col{gap:18px}
+  .h1.sm{font-size:1.9rem}
+  .h1{font-size:2.2rem}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:start}
+  .split.board-split{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+  .cards3{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;align-items:start}
+  .seg{max-width:440px}
+  .pills{flex-wrap:wrap;overflow:visible}
+  .pill{max-width:none}
+  .tiles{max-width:720px}
+  .grid2{max-width:720px}
+  .page>.field,.page>.card:not(.board),.page>form.card{max-width:640px}
+  .page>.empty{max-width:640px}
+  .toast{bottom:32px}
+  /* auth */
+  #app.authwrap{max-width:1080px}
+  .auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 72px;align-content:center;padding-block:48px}
+  .auth-hero .h1.xl{font-size:3.4rem}
+  .auth .foot{grid-column:1/-1}
+  /* overlays become centred panels */
+  .ov{display:flex;align-items:center;justify-content:center;background:var(--scrim);padding-block:24px}
+  .ov-in{width:100%;max-width:840px;height:100%;max-height:920px;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding-inline:32px;overflow:hidden}
+  .ov-h{padding-block:16px 8px}
+  .ov-body{padding-block:14px 22px}
+  .scrim{align-items:center;padding:24px}
+  .sheet{border-radius:18px;max-width:460px}
+  .qtext{font-size:1.4rem}
+  .opts{gap:12px}
+  .opt{min-height:62px}
+  .ex-foot{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px}
+  .ex-foot .pal{flex:1;min-width:260px}
+  .ex-foot .grid2{grid-template-columns:auto auto;gap:12px}
+  .ex-foot .btn{min-width:130px}
+  .ov-foot{display:flex;justify-content:flex-end}
+  .ov-foot .btn.block{width:auto;min-width:240px}
+  .facts{max-width:520px}
+  .q-ed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+  .q-ed>.rv-h,.q-ed>.field:nth-child(2){grid-column:1/-1}
+}
+@media (min-width:1500px){
+  .page{max-width:1240px}
+}
+
+/* ---------- modern polish layer (visual only) ---------- */
+:root{--r:16px}
+body{background:radial-gradient(1200px 500px at 50% -200px,var(--accent-soft),transparent 70%) no-repeat,var(--bg);letter-spacing:.005em;-webkit-font-smoothing:antialiased}
+.top{position:relative;padding-block:10px}
+.brand{font-size:1.3rem;letter-spacing:-.01em}
+.brand .mark{color:var(--accent)}
+.timing{height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2),transparent);border-radius:3px;opacity:.9}
+.icon-btn{box-shadow:var(--shadow);border-color:transparent;transition:transform .15s,box-shadow .15s}
+.icon-btn:active{transform:scale(.94)}
+.h1{letter-spacing:-.015em}
+.h2{letter-spacing:-.005em}
+.card,.tile,.btn-card{border-radius:var(--r);border-color:var(--line);box-shadow:var(--shadow)}
+.card{padding:16px}
+.card.board{overflow:hidden}
+.tile{padding:14px}
+.tile b{background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tile.warn b{background:none;color:var(--warn)}
+.btn-card,.secrow,.stuline,.opt,.pill,.pb,.btn,.tab{transition:background-color .15s,border-color .15s,transform .12s,box-shadow .15s,filter .15s}
+.btn{border-radius:12px;min-height:48px;font-weight:600;letter-spacing:.01em}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 4px 12px rgba(10,115,150,.28);border-color:transparent}
+.btn.primary:active,.btn:active{transform:translateY(1px) scale(.99)}
+.btn.ghost{background:var(--surface);box-shadow:var(--shadow)}
+.btn.danger{background:var(--surface)}
+.chip{padding:2px 11px;font-weight:600;letter-spacing:.01em}
+.chip.mute{box-shadow:inset 0 0 0 1px var(--line)}
+input,select,textarea{border-radius:12px;border:1.5px solid var(--line);background:var(--surface);transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.field label{color:var(--muted);font-size:.84rem;letter-spacing:.02em}
+.seg{border-radius:14px;background:var(--surface);padding:4px;gap:4px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.seg button{border-radius:10px}
+.seg button.on{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 8px rgba(10,115,150,.3)}
+.pill{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.pill.on{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+.empty{background:transparent}
+/* nav */
+.tabs{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.tab.on .ic{background:var(--accent-soft);color:var(--accent)}
+.tab.on{font-weight:700}
+/* leaderboard */
+.stand{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%);box-shadow:0 10px 24px rgba(10,115,150,.3);border-radius:20px;padding:16px;position:relative;overflow:hidden}
+.stand::after{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.stand-rank{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.7)}
+.row{padding:12px 16px}
+.row.me{background:linear-gradient(90deg,var(--accent-soft),transparent)}
+.rankb{border-width:1.5px;background:var(--surface)}
+.rankb.medal{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+.pblock{border-radius:14px 14px 0 0;box-shadow:var(--shadow)}
+.pcol.first .pblock{background:linear-gradient(180deg,var(--accent-2),var(--accent));border-color:transparent}
+.mbar{height:6px;background:var(--accent-soft)}
+.mbar i{background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px}
+.secrow,.stuline{background:var(--surface)}
+.secrow{border-radius:14px;box-shadow:var(--shadow);border-color:transparent}
+.stuline{padding-inline:16px}
+/* exam */
+.timer{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent)}
+.bar{height:6px;border-radius:6px}
+.bar i{background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px;transition:width .25s}
+.opt{border-radius:14px;box-shadow:var(--shadow);border-color:transparent;background:var(--surface);border:1.5px solid var(--line)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.bubble{border-width:1.5px}
+.pb{box-shadow:var(--shadow);border-color:transparent;background:var(--surface)}
+.pb.done{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.pb.cur{box-shadow:inset 0 0 0 2.5px var(--ink)}
+.ex-foot,.ov-foot{background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.ring-fg{stroke:var(--accent)}
+.ring-bg{stroke:var(--accent-soft)}
+.ro{border-radius:12px}
+.calc{border-radius:12px}
+.sheet{box-shadow:var(--shadow-lg);border-radius:22px 22px 0 0}
+.toast{box-shadow:var(--shadow-lg);border-radius:14px}
+.m{border-radius:6px}
+@media (prefers-reduced-motion:no-preference){
+  .page>*,.ov-body>*{animation:fadeup .28s ease-out both}
+  @keyframes fadeup{from{opacity:0;transform:translateY(6px)}}
+  .ov{animation:fadein .18s ease-out}
+  @keyframes fadein{from{opacity:0}}
+}
+@media (hover:hover){
+  .card.exam:hover,.btn-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+  .secrow:hover{box-shadow:var(--shadow-lg)}
+  .stuline:hover{background:var(--accent-soft)}
+}
+@media (min-width:900px){
+  body{background:radial-gradient(1400px 600px at 50% -240px,var(--accent-soft),transparent 70%) no-repeat,var(--bg)}
+  #app.shell>.tabs{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .tab.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+  .ov-in{box-shadow:var(--shadow-lg);border-radius:24px;background:var(--bg)}
+  .ex-foot,.ov-foot{backdrop-filter:none}
+  .card{padding:20px}
+}
+
+/* ---------- additions: clickable answer-sheet rows, header delete, bonus ---------- */
+.row.rowbtn{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;color:inherit}
+.row.rowbtn:last-child{border-bottom:0}
+.card.cardbtn{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.icon-btn.del{color:var(--bad)}
+.icon-btn.del.armed{background:var(--bad);color:#fff}
+.ov-body>*{flex:none}
+.ov-h .chip{white-space:nowrap;flex:none}
+.ov-h h2{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bonus-chip{font-family:var(--f-display)}
+@media (hover:hover){
+  .row.rowbtn:hover{background:var(--accent-soft)}
+  .card.cardbtn:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+}
+</style>
+
+<div id="app"></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+/*LOGIC-START*/
+var KEY='livemcq-demo-v3';
+var BN='০১২৩৪৫৬৭৮৯';
+var bn=function(v){return String(v).replace(/\d/g,function(d){return BN[+d];});};
+var asc=function(s){return String(s).replace(/[০-৯]/g,function(d){return BN.indexOf(d);});};
+var r2=function(n){return Math.round(n*100)/100;};
+var num=function(n){return bn(String(r2(n)).replace('-','−'));};
+var mmss=function(s){return bn(String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));};
+var ORD={1:'১ম',2:'২য়',3:'৩য়',4:'৪র্থ',5:'৫ম',6:'৬ষ্ঠ',7:'৭ম',8:'৮ম',9:'৯ম',10:'১০ম'};
+var ord=function(n){return ORD[n]||bn(n)+'তম';};
+var Q=function(q,o,a){return {q:q,opts:o,ans:a};};
+
+var db=null, session=null, apiLog=[];
+
+/* demo attempts that only stored counts get a matching answer sheet (same correct/wrong/blank numbers) */
+function fillAnswers(d){
+  d.attempts.forEach(function(a){
+    if(a.answers)return;
+    var ex=d.exams.filter(function(e){return e.id===a.examId;})[0];
+    if(!ex)return;
+    var n=ex.questions.length;
+    if(a.correct+a.wrong+a.blank!==n)return;
+    var salt=parseInt(String(a.id).replace(/\D/g,''),10)||0,start=salt%n,ans=new Array(n);
+    for(var k=0;k<n;k++){
+      var i=(start+k)%n,q=ex.questions[i];
+      if(k<a.correct)ans[i]=q.ans;
+      else if(k<a.correct+a.wrong)ans[i]=(q.ans+1+((i+salt)%3))%q.opts.length;
+      else ans[i]=null;
+    }
+    a.answers=ans;
+  });
+}
+function seed(){
+  var d={seq:100,
+    classes:[
+      {id:'c9',name:'নবম শ্রেণি',sections:['ক','খ']},
+      {id:'c10',name:'দশম শ্রেণি',sections:['ক','খ']},
+      {id:'c8',name:'অষ্টম শ্রেণি',sections:['ক']}
+    ],
+    users:[
+      {id:'a1',role:'admin',name:'অ্যাডমিন',roll:'admin',password:'admin'},
+      {id:'u1',role:'student',name:'আসাদুল্লাহ আতিক',roll:'250112',password:'1234',phone:'',classId:'c9',section:'ক'},
+      {id:'u2',role:'student',name:'রাফি আহমেদ',roll:'101',password:'1234',phone:'',classId:'c9',section:'ক'},
+      {id:'u3',role:'student',name:'তানজিলা ইসলাম',roll:'102',password:'1234',phone:'',classId:'c9',section:'ক'},
+      {id:'u4',role:'student',name:'মেহেদী হাসান',roll:'103',password:'1234',phone:'',classId:'c9',section:'খ'},
+      {id:'u5',role:'student',name:'ফারিয়া তাবাসসুম',roll:'104',password:'1234',phone:'',classId:'c9',section:'খ'},
+      {id:'u6',role:'student',name:'আরিফ হোসেন',roll:'105',password:'1234',phone:'',classId:'c9',section:'ক'},
+      {id:'u7',role:'student',name:'ফাহিম রেজা',roll:'201',password:'1234',phone:'',classId:'c10',section:'ক'},
+      {id:'u8',role:'student',name:'মীম আক্তার',roll:'202',password:'1234',phone:'',classId:'c10',section:'খ'}
+    ],
+    exams:[],attempts:[]};
+  var ph={u1:'01712345678',u2:'01811000101',u3:'01911000102',u4:'01611000103',u5:'01711000104',u6:'01511000105',u7:'01811000201',u8:'01911000202'};
+  d.users.forEach(function(u){if(ph[u.id])u.phone=ph[u.id];});
+  d.exams.push({id:'e1',title:'সাধারণ বিজ্ঞান – মডেল টেস্ট ১',classId:'c9',duration:5,perQ:1,neg:0.25,published:true,questions:[
+    Q('পানির রাসায়নিক সংকেত কোনটি?',['H₂O','CO₂','NaCl','O₂'],0),
+    Q('আলোর গতি প্রায় কত?',['৩ × ১০⁸ মি/সে','৩ × ১০⁶ মি/সে','৩ × ১০⁵ মি/সে','৩ × ১০¹⁰ মি/সে'],0),
+    Q('সালোকসংশ্লেষণে উদ্ভিদ কোন গ্যাস গ্রহণ করে?',['অক্সিজেন','নাইট্রোজেন','কার্বন ডাই-অক্সাইড','হাইড্রোজেন'],2),
+    Q('মানবদেহের সবচেয়ে বড় অঙ্গ কোনটি?',['যকৃৎ','ত্বক','ফুসফুস','মস্তিষ্ক'],1),
+    Q('বল পরিমাপের একক কোনটি?',['জুল','ওয়াট','নিউটন','পাস্কাল'],2)]});
+  d.exams.push({id:'e2',title:'গণিত – দ্রুত পরীক্ষা',classId:'c9',duration:4,perQ:1,neg:0.25,published:false,questions:[
+    Q('১২ × ৮ = কত?',['৮৪','৯৬','১০৮','১০৪'],1),
+    Q('x + ৭ = ১৫ হলে x এর মান কত?',['৬','৯','৮','২২'],2),
+    Q('সমবাহু ত্রিভুজের প্রতিটি কোণ কত ডিগ্রি?',['৬০','৪৫','৯০','১২০'],0),
+    Q('৩৬ এর বর্গমূল কত?',['৪','৯','১৮','৬'],3),
+    Q('২⁵ এর মান কত?',['১০','৩২','১৬','২৫'],1)]});
+  d.exams.push({id:'e3',title:'English – Grammar Quiz',classId:'c10',duration:6,perQ:1,neg:0.25,published:true,questions:[
+    Q('She ___ to school every day.',['go','goes','going','gone'],1),
+    Q('What is the plural of "child"?',['childs','childes','children','childrens'],2),
+    Q('Which word means the same as "happy"?',['sad','joyful','angry','tired'],1),
+    Q('I have ___ apple.',['an','a','the','some'],0),
+    Q('What is the past tense of "write"?',['writed','wrote','written','writes'],1)]});
+  d.exams.push({id:'e4',title:'বাংলা – ব্যাকরণ কুইজ',classId:'c9',duration:5,perQ:1,neg:0.25,published:true,questions:[
+    Q('বাংলা বর্ণমালায় স্বরবর্ণ কয়টি?',['১০টি','১১টি','৭টি','৩৯টি'],1),
+    Q('কোনটি বিশেষ্য পদ?',['সুন্দর','ঢাকা','দৌড়ায়','খুব'],1),
+    Q('"আকাশ" শব্দের সমার্থক শব্দ কোনটি?',['গগন','সাগর','পাহাড়','নদী'],0),
+    Q('"অন্ধকার" শব্দের বিপরীত শব্দ কোনটি?',['রাত','আলো','ছায়া','কালো'],1),
+    Q('সন্ধি বিচ্ছেদ করো: "বিদ্যালয়"',['বিদ্যা + আলয়','বিদ + আলয়','বিদ্য + লয়','বিদ্যা + লয়'],0)]});
+  d.exams.push({id:'e5',title:'বাংলাদেশ ও বিশ্বপরিচয় – কুইজ',classId:'c9',duration:5,perQ:1,neg:0.25,published:true,questions:[
+    Q('বাংলাদেশের জাতীয় ফুল কোনটি?',['গোলাপ','শাপলা','রজনীগন্ধা','বেলি'],1),
+    Q('বাংলাদেশের স্বাধীনতা দিবস কবে?',['১৬ ডিসেম্বর','২১ ফেব্রুয়ারি','২৬ মার্চ','১৪ এপ্রিল'],2),
+    Q('বাংলাদেশের রাজধানী কোনটি?',['চট্টগ্রাম','ঢাকা','খুলনা','রাজশাহী'],1),
+    Q('বাংলাদেশের বৃহত্তম সমুদ্র সৈকত কোনটি?',['কক্সবাজার','কুয়াকাটা','পতেঙ্গা','টেকনাফ'],0),
+    Q('"আমার সোনার বাংলা" গানের রচয়িতা কে?',['কাজী নজরুল ইসলাম','রবীন্দ্রনাথ ঠাকুর','জীবনানন্দ দাশ','মাইকেল মধুসূদন দত্ত'],1)]});
+  d.exams.push({id:'e6',title:'ICT – প্রাথমিক ধারণা',classId:'c9',duration:5,perQ:1,neg:0.25,published:false,questions:[
+    Q('কম্পিউটারের "মস্তিষ্ক" কোনটি?',['মনিটর','সিপিইউ','কিবোর্ড','মাউস'],1),
+    Q('কোনটি ইন্টারনেট ব্রাউজার?',['ক্রোম','এক্সেল','ওয়ার্ড','পেইন্ট'],0),
+    Q('কোনটি ইনপুট ডিভাইস?',['প্রিন্টার','স্পিকার','কিবোর্ড','মনিটর'],2),
+    Q('১ বাইট সমান কত বিট?',['৪','৮','১৬','২'],1),
+    Q('WWW এর পূর্ণরূপ কী?',['World Wide Web','World Web Window','Wide World Web','Web World Wide'],0)]});
+  d.exams.forEach(function(e,i){if(e.published)e.pubSeq=i+1;});
+  function at(ex,u,c,w,b,t,ans){
+    var e=d.exams.filter(function(x){return x.id===ex;})[0];
+    d.attempts.push({id:'at'+(++d.seq),examId:ex,userId:u,answers:ans||null,correct:c,wrong:w,blank:b,
+      marks:Math.max(0,r2(c*e.perQ-w*e.neg)),timeSec:t});
+  }
+  at('e1','u1',4,0,1,205,[0,0,2,null,2]);
+  at('e1','u2',5,0,0,212);
+  at('e1','u3',4,0,1,188);
+  at('e1','u4',4,1,0,260);
+  at('e1','u5',4,1,0,260);
+  at('e1','u6',3,0,2,150);
+  at('e2','u2',5,0,0,190);
+  at('e2','u6',5,0,0,190);
+  at('e2','u3',4,1,0,170);
+  at('e2','u4',4,0,1,210);
+  at('e2','u5',3,1,1,230);
+  at('e4','u1',4,1,0,230,[1,1,0,0,0]);
+  at('e4','u2',5,0,0,195);
+  at('e4','u3',5,0,0,240);
+  at('e4','u4',4,0,1,200);
+  at('e4','u5',3,1,1,250);
+  at('e4','u6',4,0,1,180);
+  at('e5','u1',5,0,0,150,[1,2,1,0,1]);
+  at('e5','u2',4,0,1,170);
+  at('e5','u3',5,0,0,140);
+  at('e5','u4',3,1,1,210);
+  at('e5','u5',4,1,0,190);
+  at('e5','u6',5,0,0,150);
+  at('e3','u7',5,0,0,140);
+  at('e3','u8',4,1,0,160);
+  fillAnswers(d);
+  return d;
+}
+function loadDb(){
+  try{var r=localStorage.getItem(KEY);if(r){var o=JSON.parse(r);db=o.db;session=o.session;}}catch(e){}
+  if(!db){db=seed();session=null;}
+  else fillAnswers(db);
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({db:db,session:session}));}catch(e){}}
+
+/* ---- simulated REST backend (runs inside the page) ---- */
+function U(){return session?db.users.filter(function(u){return u.id===session.userId;})[0]:null;}
+function clsOf(id){var c=db.classes.filter(function(x){return x.id===id;})[0];return c;}
+function clsName(id){var c=clsOf(id);return c?c.name:'—';}
+function pubUser(u){return {id:u.id,role:u.role,name:u.name,roll:u.roll,phone:u.phone||'',classId:u.classId||null,section:u.section||null,className:u.classId?clsName(u.classId):''};}
+/* full marks = questions x per-question marks + the teacher's flat bonus, so no mark can exceed it */
+function baseTotal(ex){return r2(ex.questions.length*ex.perQ);}
+function total(ex){return r2(baseTotal(ex)+(ex.bonus||0));}
+function evaluate(ex,ans){
+  var c=0,w=0,b=0;
+  ex.questions.forEach(function(q,i){var a=ans[i];if(a==null)b++;else if(a===q.ans)c++;else w++;});
+  return {correct:c,wrong:w,blank:b,marks:Math.max(0,r2(c*ex.perQ-w*ex.neg))};
+}
+/* marks before any teacher bonus; attempt.marks = rawMarks + exam.bonus */
+function rawMarks(ex,a){return Math.max(0,r2(a.correct*ex.perQ-a.wrong*ex.neg));}
+/* equal marks and equal time share a rank; otherwise less time ranks higher */
+function ranking(examId){
+  var list=db.attempts.filter(function(a){return a.examId===examId;}).slice()
+    .sort(function(a,b){return b.marks-a.marks||a.timeSec-b.timeSec;});
+  var r=0;
+  return list.map(function(a,i){
+    var p=list[i-1];
+    if(!(p&&p.marks===a.marks&&p.timeSec===a.timeSec))r=i+1;
+    return Object.assign({},a,{rank:r});
+  });
+}
+function rankRows(list){
+  var r=0;
+  return list.map(function(x,i){
+    var p=list[i-1];
+    if(!(p&&p.marks===x.marks&&p.timeSec===x.timeSec))r=i+1;
+    return Object.assign({},x,{rank:r});
+  });
+}
+function examSummary(ex,user){
+  var att=db.attempts.filter(function(a){return a.examId===ex.id;});
+  var o={id:ex.id,title:ex.title,classId:ex.classId,className:clsName(ex.classId),duration:ex.duration,perQ:ex.perQ,neg:ex.neg,
+    qCount:ex.questions.length,total:total(ex),base:baseTotal(ex),published:ex.published,pubSeq:ex.pubSeq||0,attempts:att.length,bonus:ex.bonus||0};
+  if(user&&user.role==='student'){
+    var mine=att.filter(function(a){return a.userId===user.id;})[0];
+    o.subOrder=mine?db.attempts.indexOf(mine):-1;
+    o.state=mine?(ex.published?'published':'pending'):(ex.published?'missed':'open');
+    if(mine&&ex.published){
+      var rk=ranking(ex.id).filter(function(x){return x.userId===user.id;})[0];
+      o.marks=mine.marks;o.rank=rk.rank;o.timeSec=mine.timeSec;o.participants=att.length;
+    }
+  }
+  return o;
+}
+function findExam(id){return db.exams.filter(function(e){return e.id===id;})[0];}
+function route(m,path,b){
+  var p=path,me=U(),r;
+  var ok=function(d){return {status:200,data:d};};
+  var fail=function(s,e){return {status:s,error:e};};
+  var mt=function(mm,re){return m===mm&&(r=p.match(re));};
+  if(mt('POST',/^\/api\/dev\/reset$/)){db=seed();session=null;return ok({});}
+  if(mt('POST',/^\/api\/auth\/login$/)){
+    var roll=asc(b.roll||'').trim().toLowerCase();
+    var u=db.users.filter(function(x){return x.roll.toLowerCase()===roll&&x.password===b.password;})[0];
+    if(!u)return fail(401,'রোল বা পাসওয়ার্ড মিলছে না');
+    session={userId:u.id};return ok(pubUser(u));
+  }
+  if(mt('POST',/^\/api\/auth\/register$/)){
+    var name=(b.name||'').trim(),rl=asc(b.roll||'').trim();
+    if(name.length<3)return fail(422,'পুরো নাম লিখুন');
+    if(!/^\d{2,8}$/.test(rl))return fail(422,'রোল নম্বর শুধু সংখ্যা হবে (২–৮ অঙ্ক)');
+    if((b.password||'').length<4)return fail(422,'পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে');
+    if(db.users.some(function(x){return x.roll===rl;}))return fail(409,'এই রোল দিয়ে আগেই অ্যাকাউন্ট আছে');
+    var c=clsOf(b.classId);
+    if(!c||c.sections.indexOf(b.section)<0)return fail(422,'শ্রেণি ও শাখা বেছে নিন');
+    var nu={id:'u'+(++db.seq),role:'student',name:name,roll:rl,password:b.password,phone:'',classId:c.id,section:b.section};
+    db.users.push(nu);session={userId:nu.id};return ok(pubUser(nu));
+  }
+  if(mt('POST',/^\/api\/auth\/logout$/)){session=null;return ok({});}
+  if(mt('GET',/^\/api\/classes$/)){
+    return ok(db.classes.map(function(c){return Object.assign({},c,{
+      students:db.users.filter(function(u){return u.role==='student'&&u.classId===c.id;}).length,
+      exams:db.exams.filter(function(e){return e.classId===c.id;}).length,
+      secCounts:c.sections.reduce(function(m,sn){m[sn]=db.users.filter(function(u){return u.role==='student'&&u.classId===c.id&&u.section===sn;}).length;return m;},{})});}));
+  }
+  if(!me)return fail(401,'আগে লগইন করুন');
+  var adm=me.role==='admin';
+  var needAdm=function(){return adm?null:fail(403,'এটি শুধু অ্যাডমিন করতে পারেন');};
+  var g;
+
+  if(mt('GET',/^\/api\/me$/))return ok(pubUser(me));
+  if(mt('PATCH',/^\/api\/users\/me$/)){
+    var nm=(b.name||'').trim();
+    if(nm.length<3)return fail(422,'পুরো নাম লিখুন');
+    var ph=asc(b.phone||'').trim();
+    if(ph&&!/^\d{6,15}$/.test(ph))return fail(422,'ফোন নম্বর সঠিক নয়');
+    me.name=nm;me.phone=ph;return ok(pubUser(me));
+  }
+  if(mt('GET',/^\/api\/exams$/)){
+    var list=db.exams.filter(function(e){return adm||e.classId===me.classId;}).slice().reverse();
+    return ok(list.map(function(e){return examSummary(e,me);}));
+  }
+  if(mt('GET',/^\/api\/exams\/(\w+)\/paper$/)){
+    var ex=findExam(r[1]);if(!ex)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    if(adm||ex.classId!==me.classId)return fail(403,'এই পরীক্ষা আপনার শ্রেণির নয়');
+    if(ex.published)return fail(403,'ফলাফল প্রকাশিত হয়ে গেছে, আর অংশ নেওয়া যাবে না');
+    if(db.attempts.some(function(a){return a.examId===ex.id&&a.userId===me.id;}))return fail(409,'আপনি এই পরীক্ষা আগেই দিয়েছেন');
+    return ok({id:ex.id,title:ex.title,duration:ex.duration,perQ:ex.perQ,neg:ex.neg,total:total(ex),
+      questions:ex.questions.map(function(q){return {q:q.q,opts:q.opts};})});
+  }
+  if(mt('POST',/^\/api\/exams\/(\w+)\/submit$/)){
+    var ex2=findExam(r[1]);if(!ex2)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    if(adm||ex2.classId!==me.classId)return fail(403,'এই পরীক্ষা আপনার শ্রেণির নয়');
+    if(ex2.published)return fail(403,'ফলাফল প্রকাশিত হয়ে গেছে');
+    if(db.attempts.some(function(a){return a.examId===ex2.id&&a.userId===me.id;}))return fail(409,'আপনি এই পরীক্ষা আগেই দিয়েছেন');
+    var raw=b.answers||[];
+    var ans=ex2.questions.map(function(q,i){var a=raw[i];return (Number.isInteger(a)&&a>=0&&a<q.opts.length)?a:null;});
+    var t=Math.max(1,Math.min(ex2.duration*60,Math.round(+b.timeSec||ex2.duration*60)));
+    var ev=evaluate(ex2,ans);
+    ev.marks=r2(ev.marks+(ex2.bonus||0));
+    db.attempts.push(Object.assign({id:'at'+(++db.seq),examId:ex2.id,userId:me.id,answers:ans,timeSec:t},ev));
+    return ok({submitted:true,evaluated:true,timeSec:t});
+  }
+  if(mt('GET',/^\/api\/results\/(\w+)$/)){
+    var ex3=findExam(r[1]);if(!ex3)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    var mine=db.attempts.filter(function(a){return a.examId===ex3.id&&a.userId===me.id;})[0];
+    if(!mine)return fail(404,'আপনি এই পরীক্ষায় অংশ নেননি');
+    if(!ex3.published)return fail(403,'ফলাফল এখনো প্রকাশিত হয়নি');
+    var rk=ranking(ex3.id).filter(function(x){return x.userId===me.id;})[0];
+    return ok({exam:examSummary(ex3,me),
+      attempt:{marks:mine.marks,correct:mine.correct,wrong:mine.wrong,blank:mine.blank,timeSec:mine.timeSec,bonus:ex3.bonus||0},
+      rank:rk.rank,participants:db.attempts.filter(function(a){return a.examId===ex3.id;}).length,
+      review:ex3.questions.map(function(q,i){return {q:q.q,opts:q.opts,ans:q.ans,mine:mine.answers?mine.answers[i]:undefined};})});
+  }
+  if(mt('GET',/^\/api\/exams\/(\w+)\/leaderboard$/)){
+    var ex4=findExam(r[1]);if(!ex4)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    if(!adm&&ex4.classId!==me.classId)return fail(403,'এই লিডারবোর্ড আপনার শ্রেণির নয়');
+    if(!adm&&!ex4.published)return fail(403,'ফলাফল প্রকাশের পর লিডারবোর্ড দেখা যাবে');
+    var rows=ranking(ex4.id).map(function(a){
+      var u2=db.users.filter(function(x){return x.id===a.userId;})[0]||{};
+      var row={rank:a.rank,name:u2.name,roll:u2.roll,marks:a.marks,timeSec:a.timeSec,correct:a.correct,wrong:a.wrong,me:a.userId===me.id};
+      if(adm)row.userId=a.userId;
+      return row;});
+    return ok({exam:examSummary(ex4,adm?null:me),rows:rows});
+  }
+
+  if(mt('GET',/^\/api\/leaderboard\/overall$/)){
+    if(adm)return fail(403,'এটি শুধু শিক্ষার্থীর জন্য');
+    var pb=db.exams.filter(function(e){return e.classId===me.classId&&e.published;});
+    var pbIds=pb.map(function(e){return e.id;});
+    var agg={};
+    db.attempts.forEach(function(a){
+      if(pbIds.indexOf(a.examId)<0)return;
+      var o=agg[a.userId]||(agg[a.userId]={marks:0,timeSec:0,taken:0});
+      o.marks=r2(o.marks+a.marks);o.timeSec+=a.timeSec;o.taken++;
+    });
+    var lst=[];
+    Object.keys(agg).forEach(function(uid){
+      var us=db.users.filter(function(x){return x.id===uid;})[0];
+      if(!us||us.classId!==me.classId)return;
+      lst.push({userId:uid,name:us.name,roll:us.roll,marks:agg[uid].marks,timeSec:agg[uid].timeSec,taken:agg[uid].taken,me:uid===me.id});
+    });
+    lst.sort(function(a,b){return b.marks-a.marks||a.timeSec-b.timeSec;});
+    return ok({className:clsName(me.classId),examCount:pb.length,full:r2(pb.reduce(function(s2,e){return s2+total(e);},0)),rows:rankRows(lst)});
+  }
+
+  /* admin only */
+  if(mt('GET',/^\/api\/admin\/summary$/)){
+    if((g=needAdm()))return g;
+    var all=db.exams.slice().reverse().map(function(e){return examSummary(e,null);});
+    return ok({students:db.users.filter(function(u){return u.role==='student';}).length,examCount:all.length,
+      pending:all.filter(function(e){return !e.published&&e.attempts>0;}),
+      published:all.filter(function(e){return e.published;}).sort(function(a,b){return b.pubSeq-a.pubSeq;})});
+  }
+  if(mt('GET',/^\/api\/admin\/exams$/)){
+    if((g=needAdm()))return g;
+    return ok(db.exams.slice().reverse().map(function(e){return examSummary(e,null);}));
+  }
+  /* one student's answer sheet for one exam, with marks, rank and a per-question review */
+  if(mt('GET',/^\/api\/admin\/exams\/(\w+)\/attempts\/(\w+)$/)){
+    if((g=needAdm()))return g;
+    var exA=findExam(r[1]);if(!exA)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    var stA=db.users.filter(function(x){return x.id===r[2]&&x.role==='student';})[0];
+    if(!stA)return fail(404,'শিক্ষার্থী পাওয়া যায়নি');
+    var atA=db.attempts.filter(function(a){return a.examId===exA.id&&a.userId===stA.id;})[0];
+    if(!atA)return fail(404,'এই শিক্ষার্থী এই পরীক্ষায় অংশ নেয়নি');
+    var rkA=ranking(exA.id).filter(function(x){return x.userId===stA.id;})[0];
+    return ok({exam:examSummary(exA,null),student:pubUser(stA),
+      attempt:{marks:atA.marks,raw:rawMarks(exA,atA),bonus:exA.bonus||0,correct:atA.correct,wrong:atA.wrong,blank:atA.blank,timeSec:atA.timeSec},
+      rank:rkA.rank,participants:db.attempts.filter(function(a){return a.examId===exA.id;}).length,
+      hasAnswers:!!atA.answers,
+      review:exA.questions.map(function(q,i){return {q:q.q,opts:q.opts,ans:q.ans,mine:atA.answers?atA.answers[i]:undefined};})});
+  }
+  if(mt('GET',/^\/api\/admin\/exams\/(\w+)$/)){
+    if((g=needAdm()))return g;
+    var ex5=findExam(r[1]);if(!ex5)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    return ok({exam:examSummary(ex5,null),questions:ex5.questions});
+  }
+  if(mt('GET',/^\/api\/admin\/students$/)){
+    if((g=needAdm()))return g;
+    return ok(db.users.filter(function(u){return u.role==='student';}).map(function(u){
+      return Object.assign(pubUser(u),{attempts:db.attempts.filter(function(a){return a.userId===u.id;}).length});}));
+  }
+  if(mt('GET',/^\/api\/admin\/classes\/(\w+)\/sections\/([^\/]+)\/students$/)){
+    if((g=needAdm()))return g;
+    var cc=clsOf(r[1]),secName=decodeURIComponent(r[2]);
+    if(!cc||cc.sections.indexOf(secName)<0)return fail(404,'শ্রেণি বা শাখা পাওয়া যায়নি');
+    var cex=db.exams.filter(function(e){return e.classId===cc.id;});
+    var stl=db.users.filter(function(u){return u.role==='student'&&u.classId===cc.id&&u.section===secName;}).map(function(u){
+      var my=db.attempts.filter(function(a){return a.userId===u.id&&cex.some(function(e){return e.id===a.examId;});});
+      return {id:u.id,name:u.name,roll:u.roll,phone:u.phone||'',taken:my.length,examCount:cex.length,marks:r2(my.reduce(function(s2,a){return s2+a.marks;},0))};
+    }).sort(function(a,b){return (+a.roll)-(+b.roll);});
+    return ok({classId:cc.id,className:cc.name,section:secName,examCount:cex.length,students:stl});
+  }
+  if(mt('GET',/^\/api\/admin\/students\/(\w+)\/report$/)){
+    if((g=needAdm()))return g;
+    var su=db.users.filter(function(x){return x.id===r[1]&&x.role==='student';})[0];
+    if(!su)return fail(404,'শিক্ষার্থী পাওয়া যায়নি');
+    var rexs=db.exams.filter(function(e){return e.classId===su.classId;}).slice().reverse();
+    var rrows=rexs.map(function(e){
+      var att=db.attempts.filter(function(a){return a.examId===e.id&&a.userId===su.id;})[0];
+      var o={id:e.id,title:e.title,total:total(e),published:e.published,taken:!!att,bonus:e.bonus||0};
+      if(att){
+        var rk2=ranking(e.id).filter(function(x){return x.userId===su.id;})[0];
+        o.marks=att.marks;o.correct=att.correct;o.wrong=att.wrong;o.blank=att.blank;o.timeSec=att.timeSec;o.rank=rk2.rank;
+        o.participants=db.attempts.filter(function(a){return a.examId===e.id;}).length;
+        o.ord=db.attempts.indexOf(att);
+      }
+      return o;
+    });
+    /* same order the student sees: open first, then taken (latest first), then missed */
+    var grp=function(x){return x.taken?1:(x.published?2:0);};
+    rrows=rrows.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){
+      var ga=grp(a.x),gb=grp(b.x);
+      if(ga!==gb)return ga-gb;
+      return ga===1?b.x.ord-a.x.ord:a.i-b.i;
+    }).map(function(w){return w.x;});
+    var tkn=rrows.filter(function(x){return x.taken;});
+    return ok({student:pubUser(su),exams:rrows,summary:{examCount:rrows.length,taken:tkn.length,missed:rrows.length-tkn.length,
+      marks:r2(tkn.reduce(function(s2,x){return s2+x.marks;},0)),full:r2(tkn.reduce(function(s2,x){return s2+x.total;},0))}});
+  }
+  if(mt('POST',/^\/api\/exams$/)){
+    if((g=needAdm()))return g;
+    var title=(b.title||'').trim();
+    if(title.length<3)return fail(422,'পরীক্ষার নাম লিখুন');
+    if(!clsOf(b.classId))return fail(422,'শ্রেণি বেছে নিন');
+    if(!Number.isInteger(b.duration)||b.duration<1||b.duration>180)return fail(422,'সময় ১ থেকে ১৮০ মিনিটের মধ্যে দিন');
+    if(!Number.isFinite(b.perQ)||b.perQ<=0)return fail(422,'প্রতি প্রশ্নের নম্বর শূন্যের বেশি হতে হবে');
+    if(!Number.isFinite(b.neg)||b.neg<0)return fail(422,'ভুল উত্তরে কাটা নম্বর শূন্য বা তার বেশি হবে');
+    var qs=b.questions||[];
+    if(!qs.length)return fail(422,'অন্তত একটি প্রশ্ন যোগ করুন');
+    for(var i=0;i<qs.length;i++){
+      var qq=qs[i];
+      if(!(qq.q||'').trim()||(qq.opts||[]).some(function(o){return !(o||'').trim();}))return fail(422,'প্রশ্ন '+bn(i+1)+' এর লেখা ও চারটি অপশন পূরণ করুন');
+    }
+    db.exams.push({id:'e'+(++db.seq),title:title,classId:b.classId,duration:b.duration,perQ:b.perQ,neg:b.neg,published:false,
+      questions:qs.map(function(x){return {q:x.q.trim(),opts:x.opts.map(function(o){return o.trim();}),ans:+x.ans||0};})});
+    return ok({id:db.exams[db.exams.length-1].id});
+  }
+  if(mt('DELETE',/^\/api\/exams\/(\w+)$/)){
+    if((g=needAdm()))return g;
+    var id=r[1];
+    db.exams=db.exams.filter(function(e){return e.id!==id;});
+    db.attempts=db.attempts.filter(function(a){return a.examId!==id;});
+    return ok({});
+  }
+  if(mt('POST',/^\/api\/exams\/(\w+)\/publish$/)){
+    if((g=needAdm()))return g;
+    var ex6=findExam(r[1]);if(!ex6)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    if(!db.attempts.some(function(a){return a.examId===ex6.id;}))return fail(422,'কেউ উত্তরপত্র জমা দেয়নি, তাই প্রকাশ করা যাবে না');
+    ex6.published=true;ex6.pubSeq=++db.seq;return ok({published:true});
+  }
+  if(mt('DELETE',/^\/api\/exams\/(\w+)\/publish$/)){
+    if((g=needAdm()))return g;
+    var ex7=findExam(r[1]);if(!ex7)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    ex7.published=false;return ok({published:false});
+  }
+  /* one flat bonus for every participant (e.g. a question was wrong); 0 removes it. It is added to every attempt, so ranking updates too */
+  if(mt('POST',/^\/api\/exams\/(\w+)\/bonus$/)){
+    if((g=needAdm()))return g;
+    var ex8=findExam(r[1]);if(!ex8)return fail(404,'পরীক্ষা পাওয়া যায়নি');
+    var bv=b.bonus;
+    if(typeof bv!=='number'||!Number.isFinite(bv)||bv<0||bv>100)return fail(422,'অতিরিক্ত নম্বর ০ থেকে ১০০ এর মধ্যে একটি সংখ্যা দিন');
+    bv=r2(bv);
+    var att8=db.attempts.filter(function(a){return a.examId===ex8.id;});
+    if(!att8.length)return fail(422,'কেউ এই পরীক্ষায় অংশ নেয়নি, তাই নম্বর যোগ করা যাবে না');
+    ex8.bonus=bv;
+    att8.forEach(function(a){a.marks=r2(rawMarks(ex8,a)+bv);});
+    return ok({bonus:bv,updated:att8.length});
+  }
+  if(mt('PATCH',/^\/api\/students\/(\w+)\/enrollment$/)){
+    if((g=needAdm()))return g;
+    var st=db.users.filter(function(x){return x.id===r[1]&&x.role==='student';})[0];
+    var c2=clsOf(b.classId);
+    if(!st||!c2||c2.sections.indexOf(b.section)<0)return fail(422,'শ্রেণি ও শাখা সঠিক নয়');
+    st.classId=c2.id;st.section=b.section;return ok(pubUser(st));
+  }
+  if(mt('POST',/^\/api\/classes$/)){
+    if((g=needAdm()))return g;
+    var cn=(b.name||'').trim();
+    if(cn.length<2)return fail(422,'শ্রেণির নাম লিখুন');
+    if(db.classes.some(function(x){return x.name===cn;}))return fail(409,'এই নামে শ্রেণি আগেই আছে');
+    db.classes.push({id:'c'+(++db.seq),name:cn,sections:['ক']});return ok({});
+  }
+  if(mt('POST',/^\/api\/classes\/(\w+)\/sections$/)){
+    if((g=needAdm()))return g;
+    var c3=clsOf(r[1]);var sn=(b.name||'').trim();
+    if(!c3)return fail(404,'শ্রেণি পাওয়া যায়নি');
+    if(!sn)return fail(422,'শাখার নাম লিখুন');
+    if(c3.sections.indexOf(sn)>=0)return fail(409,'এই শাখা আগেই আছে');
+    c3.sections.push(sn);return ok({});
+  }
+  return fail(404,'রুট পাওয়া যায়নি');
+}
+function api(method,path,body){
+  var t0=performance.now();
+  return new Promise(function(res){setTimeout(res,70+Math.random()*110);}).then(function(){
+    var out;
+    try{out=route(method,path,body||{});}catch(e){console.error(e);out={status:500,error:'সার্ভারে সমস্যা হয়েছে'};}
+    apiLog.unshift({method:method,path:path,status:out.status,ms:Math.round(performance.now()-t0)});
+    if(apiLog.length>40)apiLog.length=40;
+    save();
+    if(out.status>=400){var er=new Error(out.error||'ত্রুটি');er.status=out.status;throw er;}
+    return out.data;
+  });
+}
+/*LOGIC-END*/
+
+if(typeof document==='undefined'){module.exports={seed:seed,route:route,ranking:ranking,evaluate:evaluate,rawMarks:rawMarks,fillAnswers:fillAnswers,setDb:function(d){db=d;},getDb:function(){return db;},setSession:function(s){session=s;}};return;}
+
+/* ---------- UI ---------- */
+var LET=['ক','খ','গ','ঘ'];
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+var I={
+  home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+  list:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  trophy:'<path d="M8 4h8v6a4 4 0 0 1-8 0V4z"/><path d="M8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3"/><path d="M12 14v4M8 21h8"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+  dash:'<rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/>',
+  file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.3c2 .8 3.5 2.6 3.5 5.7"/>',
+  layers:'<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
+  sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  chev:'<path d="M9 5l7 7-7 7"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
+};
+var ico=function(n,s){s=s||22;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>';};
+var mark=function(){return '<svg class="mark" width="56" height="14" viewBox="0 0 56 14" aria-hidden="true"><circle cx="7" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="21" cy="7" r="5.2" fill="var(--accent)" stroke="var(--accent)" stroke-width="1.6"/><circle cx="35" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="49" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';};
+var chip=function(t,k){return '<span class="chip '+(k||'')+'">'+t+'</span>';};
+var loadingHtml=function(){return '<div class="loading">লোড হচ্ছে…</div>';};
+var empty=function(t){return '<div class="empty">'+t+'</div>';};
+
+var S={user:null,tab:'home',data:null,overlay:null,authMode:'login',boardId:null,boardMode:'exam',tk:0,ex:null,tm:null,draft:null,armed:null,classes:[]};
+var TABS={
+  student:[['home','হোম','home'],['results','ফলাফল','list'],['board','লিডারবোর্ড','trophy'],['profile','প্রোফাইল','user']],
+  admin:[['dash','ড্যাশবোর্ড','dash'],['exams','পরীক্ষা','file'],['students','শিক্ষার্থী','users'],['classes','শ্রেণি','layers']]
+};
+
+var toastT=null;
+function toast(msg,kind){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast '+(kind||'');el.hidden=false;
+  clearTimeout(toastT);toastT=setTimeout(function(){el.hidden=true;},2600);
+}
+
+/* ---------- views ---------- */
+function viewAuth(){
+  var cls=S.classes,c0=cls[0]||{sections:[]};
+  var login=S.authMode==='login';
+  return '<div class="auth"><div class="auth-l">'+
+    '<div class="auth-hero"><div class="bubbles" aria-hidden="true">'+LET.map(function(l,i){return '<span class="bubble lg '+(i===1?'fill':'')+'">'+l+'</span>';}).join('')+'</div>'+
+    '<h1 class="h1 xl">Live MCQ</h1><p class="lead">অনলাইন পরীক্ষা ও মূল্যায়ন ব্যবস্থা</p></div>'+
+    '<div class="timing" aria-hidden="true"></div>'+
+    '<div class="card"><p class="meta">ডেমো দেখতে এক ট্যাপে প্রবেশ করুন</p><div class="grid2"><button class="btn primary" data-act="demoStudent">শিক্ষার্থী হিসেবে</button><button class="btn ghost" data-act="demoAdmin">অ্যাডমিন হিসেবে</button></div></div>'+
+    '</div><div class="auth-r"><div class="seg"><button class="'+(login?'on':'')+'" data-act="authMode" data-m="login">লগইন</button><button class="'+(login?'':'on')+'" data-act="authMode" data-m="register">নতুন অ্যাকাউন্ট</button></div>'+
+    (login?
+      '<form data-form="login"><div class="field"><label for="l-roll">রোল নম্বর</label><input id="l-roll" name="roll" autocomplete="username" inputmode="text" value="250112"></div>'+
+      '<div class="field"><label for="l-pw">পাসওয়ার্ড</label><input id="l-pw" name="password" type="password" autocomplete="current-password" value="1234"></div>'+
+      '<button class="btn primary block" type="submit">লগইন করুন</button><p class="note">ডেমো শিক্ষার্থী: রোল ২৫০১১২, পাসওয়ার্ড ১২৩৪</p></form>':
+      '<form data-form="register"><div class="field"><label for="r-name">পুরো নাম</label><input id="r-name" name="name" autocomplete="name"></div>'+
+      '<div class="field"><label for="r-roll">রোল নম্বর</label><input id="r-roll" name="roll" inputmode="numeric"></div>'+
+      '<div class="field"><label for="r-pw">পাসওয়ার্ড (অন্তত ৪ অক্ষর)</label><input id="r-pw" name="password" type="password" autocomplete="new-password"></div>'+
+      '<div class="stu-sel"><div class="field"><label for="r-cls">শ্রেণি</label><select id="r-cls" name="classId" data-chg="regClass">'+cls.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>';}).join('')+'</select></div>'+
+      '<div class="field"><label for="r-sec">শাখা</label><select id="r-sec" name="section">'+c0.sections.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select></div></div>'+
+      '<button class="btn primary block" type="submit">অ্যাকাউন্ট খুলুন</button></form>')+
+    '</div><p class="foot">প্রকল্প: Live MCQ · সিএসই, ২য় বর্ষ ১ম সেমিস্টার · রোল ২৫০১১২</p></div>';
+}
+
+function openCard(e){
+  return '<button class="btn-card" data-act="intro" data-id="'+e.id+'"><div class="exam-h"><h3 class="h2">'+esc(e.title)+'</h3>'+chip('দিতে পারবেন')+'</div>'+
+    '<p class="meta">'+bn(e.qCount)+'টি প্রশ্ন · '+bn(e.duration)+' মিনিট · পূর্ণমান '+num(e.total)+'</p><span class="go">পরীক্ষা শুরু করুন '+ico('chev',18)+'</span></button>';
+}
+function doneRow(e){
+  if(e.state==='published')
+    return '<button class="secrow" data-act="result" data-id="'+e.id+'"><span class="who"><b>'+esc(e.title)+'</b><small>অবস্থান '+ord(e.rank)+'</small></span><span class="score"><b>'+num(e.marks)+'</b><small>/ '+num(e.total)+'</small></span><span class="chev">'+ico('chev',20)+'</span></button>';
+  return '<div class="secrow"><span class="who"><b>'+esc(e.title)+'</b><small>উত্তরপত্র জমা হয়েছে</small></span>'+chip('ফলাফলের অপেক্ষায়','warn')+'</div>';
+}
+function viewHome(){
+  var d=S.data;if(!d)return loadingHtml();
+  var u=S.user;
+  var open=d.exams.filter(function(e){return e.state==='open';});
+  var done=d.exams.filter(function(e){return e.state==='pending'||e.state==='published';}).sort(function(a,b){return b.subOrder-a.subOrder;});
+  var missed=d.exams.filter(function(e){return e.state==='missed';});
+  return '<section class="hello"><p class="eyebrow">স্বাগতম</p><h1 class="h1">'+esc(u.name.split(' ')[0])+'</h1><div class="chips">'+
+    chip(esc(u.className))+chip(esc(u.section)+' শাখা','mute')+chip('রোল '+bn(esc(u.roll)),'mute')+'</div></section>'+
+    '<div class="grid2"><div class="tile"><b>'+bn(open.length)+'</b><span>এখন দিতে পারবেন</span></div><div class="tile"><b>'+bn(done.length)+'</b><span>আগে দিয়েছেন</span></div></div>'+
+    '<div class="split"><div class="col"><h2 class="h2">এখন দিতে পারবেন</h2>'+(open.length?open.map(openCard).join(''):empty('এখন দেওয়ার মতো কোনো পরীক্ষা নেই।'))+
+    '</div><div class="col"><h2 class="h2">আগে দেওয়া পরীক্ষা</h2>'+(done.length?'<div class="card board">'+done.map(doneRow).join('')+'</div>':empty('আগে কোনো পরীক্ষা দেননি।'))+
+    (missed.length?'<h2 class="h2">অংশ নেননি</h2><div class="card board">'+missed.map(function(e){return '<div class="secrow"><span class="who"><b>'+esc(e.title)+'</b><small>ফলাফল প্রকাশিত হয়ে গেছে</small></span>'+chip('অংশ নেননি','mute')+'</div>';}).join('')+'</div>':'')+'</div></div>';
+}
+function viewResults(){
+  var d=S.data;if(!d)return loadingHtml();
+  var list=d.exams.filter(function(e){return e.state==='pending'||e.state==='published';}).sort(function(a,b){return b.subOrder-a.subOrder;});
+  var pub=list.filter(function(e){return e.state==='published';});
+  var avg=pub.length?Math.round(pub.reduce(function(s,e){return s+e.marks/e.total;},0)/pub.length*100):0;
+  var head='<h1 class="h1 sm">আমার ফলাফল</h1>';
+  if(!list.length)return head+empty('এখনো কোনো পরীক্ষা দেননি। হোম থেকে পরীক্ষা শুরু করুন।');
+  return head+'<div class="tiles"><div class="tile"><b>'+bn(list.length)+'</b><span>অংশগ্রহণ</span></div><div class="tile"><b>'+bn(pub.length)+'</b><span>প্রকাশিত</span></div><div class="tile"><b>'+(pub.length?bn(avg)+'%':'—')+'</b><span>গড় নম্বর</span></div></div>'+
+    '<p class="meta">কোনো পরীক্ষায় ট্যাপ করলে সঠিক-ভুল, অবস্থান ও উত্তরপত্র দেখা যাবে।</p><div class="card board">'+list.map(doneRow).join('')+'</div>';
+}
+/* admin review list: each row opens that student's answer sheet */
+function boardRow(r,total,eid){
+  return '<button class="row rowbtn '+(r.me?'me':'')+'" data-act="openAttempt" data-eid="'+eid+'" data-uid="'+r.userId+'" aria-label="'+esc(r.name)+' এর উত্তরপত্র দেখুন"><span class="rankb '+(r.rank<=3?'medal':'')+'">'+bn(r.rank)+'</span>'+
+    '<div class="who"><b>'+esc(r.name)+(r.me?' '+chip('আপনি','good'):'')+'</b><small>রোল '+bn(esc(r.roll))+' · সময় '+mmss(r.timeSec)+'</small></div>'+
+    '<div class="score"><b>'+num(r.marks)+'</b><small>/ '+num(total)+'</small></div><span class="chev">'+ico('chev',18)+'</span></button>';
+}
+var TIE='সমান নম্বর হলে যিনি কম সময়ে শেষ করেছেন তিনি এগিয়ে থাকেন। নম্বর ও সময় দুটোই সমান হলে অবস্থান একই হয় এবং পরের অবস্থান বাদ যায়।';
+function lbRow(r,barMax,smallTxt,sub){
+  var w=barMax?Math.round(Math.min(100,r.marks/barMax*100)):0;
+  return '<div class="row '+(r.me?'me':'')+'"><span class="rankb '+(r.rank<=3?'medal':'')+'">'+bn(r.rank)+'</span>'+
+    '<div class="who"><b>'+esc(r.name)+(r.me?' '+chip('আপনি','good'):'')+'</b><small>'+sub+'</small><i class="mbar"><i style="width:'+w+'%"></i></i></div>'+
+    '<div class="score"><b>'+num(r.marks)+'</b><small>'+smallTxt+'</small></div></div>';
+}
+function podium(rows){
+  var t=rows.slice(0,3),order=t.length>=3?[1,0,2]:(t.length===2?[1,0]:[0]),H=[96,74,58];
+  return '<div class="podium">'+order.map(function(i){
+    var r=t[i];
+    return '<div class="pcol '+(i===0?'first ':'')+(r.me?'me':'')+'"><span class="mk">'+num(r.marks)+'</span><span class="nm">'+esc(r.name.split(' ')[0])+(r.me?' (আপনি)':'')+'</span><div class="pblock" style="height:'+H[i]+'px"><span class="rankb">'+bn(r.rank)+'</span></div></div>';
+  }).join('')+'</div>';
+}
+function standCard(me,n,top,fullTxt,extra){
+  var gap=r2(top-me.marks);
+  var tail=me.rank===1?'আপনি শীর্ষে':(gap>0?'১ম থেকে '+num(gap)+' নম্বর পিছনে':'নম্বর সমান, সময়ে পিছনে');
+  return '<div class="stand"><div class="stand-rank">'+bn(me.rank)+'</div><div class="stand-r"><small>আপনার অবস্থান</small><b>'+ord(me.rank)+'</b><small>'+bn(n)+' জনের মধ্যে · শীর্ষ '+bn(Math.max(1,Math.ceil(me.rank/n*100)))+'%</small></div>'+
+    '<div class="stand-s"><b>'+num(me.marks)+'</b><small>'+fullTxt+'</small><small>'+(extra||tail)+'</small></div></div>';
+}
+function examBoardHtml(b){
+  var ex=b.exam,rows=b.rows,n=rows.length;
+  if(!n)return empty('এই পরীক্ষায় কেউ অংশ নেয়নি।');
+  var me=rows.filter(function(r){return r.me;})[0],top=rows[0].marks;
+  var avg=r2(rows.reduce(function(s,r){return s+r.marks;},0)/n);
+  return '<div class="split board-split"><div class="col">'+(me?standCard(me,n,top,'/ '+num(ex.total)):'<div class="card"><p class="meta">আপনি এই পরীক্ষায় অংশ নেননি, তাই আপনার অবস্থান নেই।</p></div>')+
+    '<div class="tiles"><div class="tile"><b>'+num(top)+'</b><span>সর্বোচ্চ</span></div><div class="tile"><b>'+num(avg)+'</b><span>গড় নম্বর</span></div><div class="tile"><b>'+bn(n)+'</b><span>অংশগ্রহণ</span></div></div>'+
+    podium(rows)+'</div><div class="col">'+
+    '<div class="card board"><div class="board-h"><h3 class="h2">সবার অবস্থান</h3><p class="meta">'+esc(ex.className)+' · পূর্ণমান '+num(ex.total)+'</p></div>'+
+    rows.map(function(r){return lbRow(r,ex.total,'/ '+num(ex.total),'রোল '+bn(esc(r.roll))+' · সময় '+mmss(r.timeSec));}).join('')+'</div><p class="note">'+TIE+'</p></div></div>';
+}
+function overallHtml(o){
+  var rows=o.rows,n=rows.length;
+  if(!n)return empty('এখনো কোনো প্রকাশিত ফলাফল নেই।');
+  var me=rows.filter(function(r){return r.me;})[0],top=rows[0].marks;
+  return '<p class="meta">'+esc(o.className)+' · প্রকাশিত '+bn(o.examCount)+'টি পরীক্ষার মোট নম্বর</p>'+
+    '<div class="split board-split"><div class="col">'+(me?standCard(me,n,top,'মোট নম্বর',bn(me.taken)+'টি পরীক্ষা'):'<div class="card"><p class="meta">আপনি এখনো কোনো প্রকাশিত পরীক্ষায় অংশ নেননি।</p></div>')+
+    podium(rows)+'</div><div class="col">'+
+    '<div class="card board"><div class="board-h"><h3 class="h2">সামগ্রিক মেধাক্রম</h3><p class="meta">যে পরীক্ষা দেওয়া হয়নি তার নম্বর যোগ হয় না</p></div>'+
+    rows.map(function(r){return lbRow(r,top,bn(r.taken)+'টি পরীক্ষা','রোল '+bn(esc(r.roll))+' · মোট সময় '+mmss(r.timeSec));}).join('')+'</div><p class="note">'+TIE+'</p></div></div>';
+}
+function viewBoard(){
+  var d=S.data;
+  var head='<h1 class="h1 sm">লিডারবোর্ড</h1><div class="seg"><button class="'+(S.boardMode==='exam'?'on':'')+'" data-act="boardMode" data-m="exam">পরীক্ষাভিত্তিক</button><button class="'+(S.boardMode==='overall'?'on':'')+'" data-act="boardMode" data-m="overall">সামগ্রিক</button></div>';
+  if(!d)return head+loadingHtml();
+  var pubs=d.exams.filter(function(e){return e.published;}).sort(function(a,b){return b.pubSeq-a.pubSeq;});
+  if(!pubs.length)return head+empty('ফলাফল প্রকাশিত হলে এখানে মেধাক্রম দেখা যাবে।');
+  if(S.boardMode==='overall')return head+(d.overall?overallHtml(d.overall):loadingHtml());
+  return head+'<div class="pills">'+pubs.map(function(e){return '<button class="pill '+(e.id===S.boardId?'on':'')+'" data-act="boardSel" data-id="'+e.id+'">'+esc(e.title)+'</button>';}).join('')+'</div>'+(d.board?examBoardHtml(d.board):loadingHtml());
+}
+function viewProfile(){
+  var u=S.user;if(!S.data)return loadingHtml();
+  return '<div class="card"><div class="exam-h"><div><h1 class="h1 sm">'+esc(u.name)+'</h1><p class="meta">রোল '+bn(esc(u.roll))+'</p></div><span class="bubble lg fill" aria-hidden="true">'+esc(u.name.charAt(0))+'</span></div>'+
+    '<div class="chips">'+chip(esc(u.className))+chip(esc(u.section)+' শাখা','mute')+'</div></div>'+
+    '<form class="card" data-form="profile"><h2 class="h2">প্রোফাইল সম্পাদনা</h2><div class="field"><label for="p-name">নাম</label><input id="p-name" name="name" value="'+esc(u.name)+'"></div>'+
+    '<div class="field"><label for="p-ph">ফোন (ঐচ্ছিক)</label><input id="p-ph" name="phone" inputmode="tel" value="'+esc(u.phone||'')+'"></div><button class="btn primary" type="submit">সংরক্ষণ করুন</button><p class="note">শ্রেণি ও শাখা অ্যাডমিন বদলাতে পারেন।</p></form>'+
+    '<button class="btn ghost block" data-act="logout">লগআউট</button>';
+}
+
+function viewDash(){
+  var d=S.data;if(!d)return loadingHtml();
+  return '<h1 class="h1 sm">অ্যাডমিন ড্যাশবোর্ড</h1><div class="tiles"><div class="tile"><b>'+bn(d.students)+'</b><span>শিক্ষার্থী</span></div><div class="tile"><b>'+bn(d.examCount)+'</b><span>পরীক্ষা</span></div><div class="tile '+(d.pending.length?'warn':'')+'"><b>'+bn(d.pending.length)+'</b><span>অনুমোদনের অপেক্ষায়</span></div></div>'+
+    '<div class="split"><div class="col"><h2 class="h2">ফলাফল প্রকাশের অনুমোদন</h2>'+
+    (d.pending.length?d.pending.map(function(e){return '<div class="card exam"><div class="exam-h"><h3>'+esc(e.title)+'</h3>'+chip(esc(e.className))+'</div><p class="meta">'+bn(e.attempts)+' জন জমা দিয়েছে · স্বয়ংক্রিয় মূল্যায়ন সম্পন্ন</p><button class="btn primary block" data-act="review" data-id="'+e.id+'">পর্যালোচনা ও প্রকাশ</button></div>';}).join(''):empty('অনুমোদনের অপেক্ষায় কোনো ফলাফল নেই।'))+
+    '</div><div class="col"><h2 class="h2">প্রকাশিত ফলাফল</h2>'+
+    (d.published.length?d.published.map(function(e){return '<button class="btn-card" data-act="review" data-id="'+e.id+'"><div class="exam-h"><h3 class="h2">'+esc(e.title)+'</h3>'+chip('প্রকাশিত','good')+'</div><p class="meta">'+esc(e.className)+' · অংশগ্রহণ '+bn(e.attempts)+' জন</p></button>';}).join(''):empty('এখনো কোনো ফলাফল প্রকাশ করা হয়নি।'))+'</div></div>';
+}
+function adminExamCard(e){
+  var st=e.published?chip('প্রকাশিত','good'):(e.attempts?chip('অনুমোদনের অপেক্ষায়','warn'):chip('কেউ দেয়নি','mute'));
+  return '<button class="btn-card" data-act="adminExam" data-id="'+e.id+'"><div class="exam-h"><h3 class="h2">'+esc(e.title)+'</h3>'+st+'</div><p class="meta">'+esc(e.className)+' · '+bn(e.qCount)+'টি প্রশ্ন · '+bn(e.duration)+' মিনিট · জমা '+bn(e.attempts)+'</p></button>';
+}
+function viewExamsAdmin(){
+  var d=S.data;if(!d)return loadingHtml();
+  var cur=d.exams.filter(function(e){return !e.published;});
+  var old=d.exams.filter(function(e){return e.published;}).sort(function(a,b){return b.pubSeq-a.pubSeq;});
+  return '<div class="exam-h"><h1 class="h1 sm">পরীক্ষা</h1><button class="btn primary sm" data-act="newExam">'+ico('plus',18)+' নতুন</button></div>'+
+    '<div class="split"><div class="col"><h2 class="h2">চলমান পরীক্ষা</h2>'+(cur.length?cur.map(adminExamCard).join(''):empty('এখন কোনো চলমান পরীক্ষা নেই।'))+
+    '</div><div class="col"><h2 class="h2">আগের পরীক্ষা</h2>'+(old.length?old.map(adminExamCard).join(''):empty('এখনো কোনো ফলাফল প্রকাশিত হয়নি।'))+'</div></div>';
+}
+function viewStudents(){
+  var d=S.data;if(!d)return loadingHtml();
+  return '<h1 class="h1 sm">শিক্ষার্থী</h1><div class="field"><label for="stuSearch">নাম বা রোল দিয়ে খুঁজুন</label><input id="stuSearch" type="search" inputmode="search"></div>'+
+    '<div class="card board" id="stuList">'+d.students.map(function(st){
+      return '<button class="stuline stu" data-act="openStudent" data-id="'+st.id+'" data-s="'+esc((st.name+' '+st.roll).toLowerCase())+'"><span class="sn">'+esc(st.name)+'</span><span class="sr">রোল '+bn(esc(st.roll))+'</span><span class="chip mute">'+esc(st.className.replace(' শ্রেণি',''))+' · '+esc(st.section)+'</span><span class="chev">'+ico('chev',18)+'</span></button>';
+    }).join('')+'<p class="loading" id="noStu" hidden>কোনো শিক্ষার্থী পাওয়া যায়নি।</p></div>';
+}
+function viewClasses(){
+  var d=S.data;if(!d)return loadingHtml();
+  return '<h1 class="h1 sm">শ্রেণি ও শাখা</h1>'+
+    '<form class="card" data-form="newClass"><div class="field"><label for="nc">নতুন শ্রেণি যোগ করুন</label><div class="addrow"><input id="nc" name="name" placeholder="যেমন: একাদশ শ্রেণি"><button class="btn primary" type="submit">যোগ</button></div></div></form>'+
+    '<p class="meta">শাখা বেছে নিলে সেই শাখার শিক্ষার্থীদের তালিকা ও পরীক্ষার ফলাফল দেখা যাবে।</p>'+
+    '<div class="cards3">'+d.classes.map(function(c){
+      return '<div class="card"><div class="exam-h"><h3 class="h2">'+esc(c.name)+'</h3>'+chip('পরীক্ষা '+bn(c.exams)+'টি','mute')+'</div>'+
+        c.sections.map(function(sn){
+          return '<button class="secrow" data-act="openSection" data-cid="'+c.id+'" data-sec="'+esc(sn)+'"><span class="bubble" aria-hidden="true">'+esc(sn)+'</span><span class="who"><b>'+esc(sn)+' শাখা</b><small>'+bn(c.secCounts[sn]||0)+' জন শিক্ষার্থী</small></span><span class="chev">'+ico('chev',20)+'</span></button>';
+        }).join('')+
+        '<form data-form="addSection" data-id="'+c.id+'"><div class="addrow"><input name="name" aria-label="'+esc(c.name)+' এর নতুন শাখার নাম" placeholder="নতুন শাখা (যেমন: গ)"><button class="btn ghost" type="submit">যোগ</button></div></form></div>';
+    }).join('')+'</div>';
+}
+function viewTab(){
+  return ({home:viewHome,results:viewResults,board:viewBoard,profile:viewProfile,dash:viewDash,exams:viewExamsAdmin,students:viewStudents,classes:viewClasses}[S.tab]||viewHome)();
+}
+function viewShell(){
+  var tabs=TABS[S.user.role];
+  return '<header class="top"><div class="brand">'+mark()+'<span>Live MCQ</span></div><div class="top-r">'+(S.user.role==='admin'?chip('অ্যাডমিন','warn'):'<span class="hdr-name">'+esc(S.user.name)+'</span>')+
+    '<button class="icon-btn" data-act="settings" aria-label="ডেমো টুলস ও সেটিংস">'+ico('sliders',20)+'</button></div></header><div class="timing" aria-hidden="true"></div>'+
+    '<main class="main"><div class="page">'+viewTab()+'</div></main>'+
+    '<nav class="tabs" aria-label="প্রধান মেনু">'+tabs.map(function(t){return '<button class="tab '+(S.tab===t[0]?'on':'')+'" data-act="tab" data-tab="'+t[0]+'"'+(S.tab===t[0]?' aria-current="page"':'')+'><span class="ic">'+ico(t[2])+'</span>'+t[1]+'</button>';}).join('')+'</nav>';
+}
+
+/* ---------- overlays ---------- */
+function ovWrap(inner){return '<div class="ov"><div class="ov-in">'+inner+'</div></div>';}
+function ovHead(title,act,right){return '<header class="ov-h"><button class="icon-btn" data-act="'+(act||'close')+'" aria-label="পিছনে">'+ico('back')+'</button><h2>'+title+'</h2>'+(right||'')+'</header>';}
+function ovIntro(){
+  var p=S.overlay.paper;
+  return ovWrap(ovHead('পরীক্ষার নির্দেশনা')+'<div class="ov-body"><h2 class="h1 sm">'+esc(p.title)+'</h2>'+
+    '<div class="facts"><div class="tile"><b>'+bn(p.questions.length)+'</b><span>প্রশ্ন</span></div><div class="tile"><b>'+bn(p.duration)+'</b><span>মিনিট</span></div><div class="tile"><b>'+num(p.total)+'</b><span>পূর্ণমান</span></div></div>'+
+    '<ul class="rules"><li>সময় শেষ হলে উত্তরপত্র নিজে থেকেই জমা হয়ে যাবে।</li><li>প্রতি প্রশ্নে একটি উত্তর বেছে নিন। বেছে নেওয়া উত্তরে আবার ট্যাপ করলে দাগ মুছে যাবে।</li><li>'+
+    (p.neg>0?'প্রতি সঠিক উত্তরে '+num(p.perQ)+' নম্বর। ভুল উত্তরে '+num(p.neg)+' নম্বর কাটা যাবে, উত্তর না দিলে কিছু কাটা যাবে না।':'প্রতি সঠিক উত্তরে '+num(p.perQ)+' নম্বর। ভুল উত্তরে নম্বর কাটা যাবে না।')+
+    '</li><li>পরীক্ষা একবারই দেওয়া যায়। জমা দিলে আর বদলানো যাবে না।</li></ul></div>'+
+    '<div class="ov-foot"><button class="btn primary block" data-act="startExam">শুরু করুন</button></div>');
+}
+function ovExam(){
+  var x=S.ex;if(!x)return '';
+  var p=x.paper,q=p.questions[x.idx],n=p.questions.length;
+  var done=x.answers.filter(function(a){return a!=null;}).length;
+  var rem=x.rem!=null?x.rem:p.duration*60;
+  var last=x.idx===n-1;
+  var body=ovWrap('<div class="timing" aria-hidden="true"></div>'+
+    '<div class="ex-top"><div><small>পরীক্ষার্থী · রোল '+bn(esc(S.user.roll))+'</small><b>'+esc(p.title)+'</b></div><span class="timer '+(rem<=60?'low':'')+'" id="timer" role="timer">'+mmss(rem)+'</span></div>'+
+    '<div class="bar"><i style="width:'+Math.round(done/n*100)+'%"></i></div>'+
+    '<div class="ov-body"><p class="qno">প্রশ্ন '+bn(x.idx+1)+' / '+bn(n)+'</p><h2 class="qtext">'+esc(q.q)+'</h2><div class="opts">'+
+    q.opts.map(function(o,j){return '<button class="opt '+(x.answers[x.idx]===j?'sel':'')+'" data-act="pick" data-j="'+j+'" aria-pressed="'+(x.answers[x.idx]===j)+'"><span class="bubble">'+LET[j]+'</span><span>'+esc(o)+'</span></button>';}).join('')+'</div></div>'+
+    '<div class="ex-foot"><div class="pal">'+p.questions.map(function(_,i){return '<button class="pb '+(x.answers[i]!=null?'done':'')+' '+(i===x.idx?'cur':'')+'" data-act="qnav" data-i="'+i+'" aria-label="প্রশ্ন '+bn(i+1)+'">'+bn(i+1)+'</button>';}).join('')+'</div>'+
+    '<div class="grid2"><button class="btn ghost" data-act="prev"'+(x.idx===0?' disabled':'')+'>আগের</button>'+
+    (last?'<button class="btn primary" data-act="askSubmit">জমা দিন</button>':'<button class="btn primary" data-act="next">পরের</button>')+'</div>'+
+    (last?'':'<button class="link" data-act="askSubmit">এখনই জমা দিন</button>')+'</div>');
+  if(x.confirm){
+    var blank=n-done;
+    body+='<div class="scrim"><div class="sheet" role="dialog" aria-modal="true"><h3 class="h2">উত্তরপত্র জমা দেবেন?</h3><p>'+bn(done)+'টি প্রশ্নের উত্তর দিয়েছেন'+(blank?', '+bn(blank)+'টি বাকি আছে':'')+'। জমা দিলে আর বদলানো যাবে না।</p>'+
+      '<div class="grid2"><button class="btn ghost" data-act="cancelSubmit">ফিরে যাই</button><button class="btn primary" data-act="doSubmit">জমা দিন</button></div></div></div>';
+  }
+  return body;
+}
+function ovSubmitted(){
+  var o=S.overlay;
+  return ovWrap('<div class="ov-body center" style="justify-content:center"><div class="bigok">'+ico('check',44)+'</div><h2 class="h1 sm">উত্তরপত্র জমা হয়েছে</h2>'+
+    '<p class="meta">'+esc(o.title)+'</p>'+(o.auto?'<p>সময় শেষ হওয়ায় উত্তরপত্র নিজে থেকেই জমা হয়েছে।</p>':'')+
+    '<p>স্বয়ংক্রিয় মূল্যায়ন সম্পন্ন হয়েছে। অ্যাডমিন ফলাফল প্রকাশ করলে এখানে নম্বর ও অবস্থান দেখতে পাবেন।</p>'+
+    '<div class="chips" style="justify-content:center">'+chip('সময় লেগেছে '+mmss(o.timeSec))+chip('ফলাফলের অপেক্ষায়','warn')+'</div></div>'+
+    '<div class="ov-foot"><button class="btn primary block" data-act="close">হোমে ফিরুন</button></div>');
+}
+/* question-by-question answer sheet; used by the student result and the admin's per-student view */
+function reviewHtml(review,mineLbl,blankLbl,noAns){
+  return review.map(function(q,i){
+    var st=noAns?['উত্তর সংরক্ষিত নেই','mute']:(q.mine==null?[blankLbl,'mute']:(q.mine===q.ans?['সঠিক','good']:['ভুল','bad']));
+    return '<div class="card"><div class="rv-h"><span class="qn">প্রশ্ন '+bn(i+1)+'</span>'+chip(st[0],st[1])+'</div><p class="qtext sm">'+esc(q.q)+'</p>'+
+      q.opts.map(function(o,j){
+        var cls=j===q.ans?'ok':(j===q.mine?'no':''),tag=j===q.ans?(j===q.mine?mineLbl+' · সঠিক':'সঠিক উত্তর'):(j===q.mine?mineLbl:'');
+        return '<div class="ro '+cls+'"><span class="bubble sm">'+LET[j]+'</span><span>'+esc(o)+'</span>'+(tag?'<span class="tag">'+tag+'</span>':'')+'</div>';
+      }).join('')+'</div>';
+  }).join('');
+}
+function calcLine(a,ex){
+  return 'নম্বর = সঠিক '+bn(a.correct)+' × '+num(ex.perQ)+' − ভুল '+bn(a.wrong)+' × '+num(ex.neg)+(a.bonus>0?' + অতিরিক্ত '+num(a.bonus):'')+' = '+num(a.marks);
+}
+function ovResult(){
+  var r=S.overlay.r,a=r.attempt,ex=r.exam,C=2*Math.PI*44,pct=ex.total?Math.min(1,a.marks/ex.total):0;
+  var rv=reviewHtml(r.review,'আপনার উত্তর','উত্তর দেননি',false);
+  return ovWrap(ovHead('ফলাফল')+'<div class="ov-body"><h2 class="h1 sm">'+esc(ex.title)+'</h2>'+
+    '<div class="ring-wrap"><div class="ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="ring-bg" cx="50" cy="50" r="44"/><circle class="ring-fg" cx="50" cy="50" r="44" stroke-dasharray="'+(C*pct)+' '+C+'" transform="rotate(-90 50 50)"/></svg><div class="ring-t"><b>'+num(a.marks)+'</b><small>/ '+num(ex.total)+'</small></div></div>'+
+    '<div class="rfacts"><div><small>অবস্থান</small><b>'+ord(r.rank)+'</b></div><div><small>অংশগ্রহণকারী</small><b>'+bn(r.participants)+' জন</b></div><div><small>সময় লেগেছে</small><b>'+mmss(a.timeSec)+'</b></div></div></div>'+
+    '<div class="stat3"><div class="tile"><b style="color:var(--good)">'+bn(a.correct)+'</b><span>সঠিক</span></div><div class="tile"><b style="color:var(--bad)">'+bn(a.wrong)+'</b><span>ভুল</span></div><div class="tile"><b>'+bn(a.blank)+'</b><span>উত্তর দেননি</span></div></div>'+
+    '<p class="calc">'+calcLine(a,ex)+'</p>'+
+    (a.bonus>0?'<p class="note">শিক্ষক সবাইকে '+num(a.bonus)+' নম্বর অতিরিক্ত দিয়েছেন।</p>':'')+
+    '<button class="btn primary block" data-act="toBoard" data-id="'+ex.id+'">লিডারবোর্ড দেখুন</button>'+
+    '<h3 class="h2">উত্তরপত্র পর্যালোচনা</h3>'+rv+'</div>');
+}
+function ovSettings(){
+  var u=S.user;
+  return ovWrap(ovHead('ডেমো টুলস')+'<div class="ov-body"><div class="card"><b>'+esc(u.name)+'</b><p class="meta">'+(u.role==='admin'?'অ্যাডমিন':'শিক্ষার্থী · রোল '+bn(esc(u.roll)))+'</p></div>'+
+    '<div class="card"><h3 class="h2">ব্যাকএন্ড সম্পর্কে</h3><p class="meta">এই ডেমোতে REST API ব্রাউজারের ভেতরেই চলছে (সিমুলেটেড)। লগইন, পরীক্ষা জমা, স্বয়ংক্রিয় মূল্যায়ন, র‍্যাংকিং ও ফলাফল প্রকাশ সবই আলাদা API কলের মাধ্যমে হয়। চূড়ান্ত সংস্করণে এটি Spring Boot ও PostgreSQL এ যাবে।</p><button class="btn ghost block" data-act="apilog">API কল লগ দেখুন</button></div>'+
+    '<button class="btn danger block '+(S.armed==='reset'?'armed':'')+'" data-act="reset">'+(S.armed==='reset'?'নিশ্চিত? আবার ট্যাপ করুন':'ডেমো ডেটা প্রথম অবস্থায় ফেরান')+'</button>'+
+    '<button class="btn ghost block" data-act="logout">লগআউট</button></div>');
+}
+function ovApiLog(){
+  return ovWrap(ovHead('API কল লগ','settings')+'<div class="ov-body"><p class="meta">সর্বশেষ কলগুলো উপরে দেখাচ্ছে।</p>'+
+    (apiLog.length?apiLog.map(function(l){return '<div class="log"><span class="m '+l.method+'">'+l.method+'</span><span class="p mono">'+esc(l.path)+'</span>'+chip(bn(l.status),l.status<400?'good':'bad')+'<span class="mono meta">'+bn(l.ms)+'ms</span></div>';}).join(''):empty('এখনো কোনো কল হয়নি।'))+'</div>');
+}
+function ovReview(){
+  var b=S.overlay.b,ex=b.exam,pub=ex.published,bonus=ex.bonus||0;
+  return ovWrap(ovHead('ফলাফল পর্যালোচনা')+'<div class="ov-body"><h2 class="h1 sm">'+esc(ex.title)+'</h2><div class="chips">'+chip(esc(ex.className))+(pub?chip('প্রকাশিত','good'):chip('অনুমোদনের অপেক্ষায়','warn'))+chip('জমা '+bn(b.rows.length),'mute')+(bonus>0?chip('অতিরিক্ত +'+num(bonus),'good'):'')+'</div>'+
+    '<p class="meta">'+(pub?'শিক্ষার্থীরা এখন নম্বর, অবস্থান ও লিডারবোর্ড দেখতে পারছে।':'নিচের মূল্যায়ন যাচাই করে প্রকাশ করুন। প্রকাশের পর এই শ্রেণির শিক্ষার্থীরা নম্বর, অবস্থান ও লিডারবোর্ড দেখতে পাবে।')+' কারও নামে ট্যাপ করলে তার উত্তরপত্র দেখা যাবে।</p>'+
+    '<form class="card" data-form="bonus" data-id="'+ex.id+'"><h3 class="h2">সবাইকে অতিরিক্ত নম্বর দিন</h3>'+
+    '<p class="meta">কোনো প্রশ্ন ভুল থাকলে এখান থেকে অংশগ্রহণকারী সবাইকে সমান নম্বর দেওয়া যায়। এটি প্রত্যেকের নম্বরে যোগ হবে, পূর্ণমানও সমান বাড়বে এবং অবস্থান নতুন করে হিসাব হবে। ০ দিলে অতিরিক্ত নম্বর বাদ যাবে।</p>'+
+    '<p class="note" id="fullNote">বর্তমান পূর্ণমান '+num(ex.total)+(bonus>0?' ('+num(ex.base)+' + অতিরিক্ত '+num(bonus)+')':'')+'</p>'+
+    '<div class="addrow"><input name="bonus" inputmode="decimal" aria-label="অতিরিক্ত নম্বর" placeholder="যেমন: ১ বা ০.৫" value="'+(bonus>0?esc(num(bonus)):'')+'"><button class="btn primary" type="submit">প্রয়োগ করুন</button></div></form>'+
+    '<div class="card board">'+b.rows.map(function(r){return boardRow(r,ex.total,ex.id);}).join('')+'</div><p class="note">'+TIE+'</p></div>'+
+    '<div class="ov-foot">'+(pub?'<button class="btn danger block" data-act="unpublish" data-id="'+ex.id+'">প্রকাশ প্রত্যাহার করুন</button>':'<button class="btn primary block" data-act="publish" data-id="'+ex.id+'">ফলাফল প্রকাশ করুন</button>')+'</div>');
+}
+/* admin: one student's answer sheet for one exam */
+function ovAttempt(){
+  var d=S.overlay.d,a=d.attempt,ex=d.exam,s=d.student;
+  return ovWrap(ovHead('উত্তরপত্র','attBack')+'<div class="ov-body"><div class="card"><div class="exam-h"><div><h2 class="h1 sm">'+esc(s.name)+'</h2><p class="meta">রোল '+bn(esc(s.roll))+' · '+esc(ex.title)+'</p></div><span class="bubble lg fill" aria-hidden="true">'+esc(s.name.charAt(0))+'</span></div>'+
+    '<div class="chips">'+chip(esc(s.className))+chip(esc(s.section)+' শাখা','mute')+(ex.published?chip('প্রকাশিত','good'):chip('ফলাফল অপ্রকাশিত','warn'))+'</div></div>'+
+    '<div class="stand"><div class="stand-rank">'+bn(d.rank)+'</div><div class="stand-r"><small>অবস্থান</small><b>'+ord(d.rank)+'</b><small>'+bn(d.participants)+' জনের মধ্যে</small></div>'+
+    '<div class="stand-s"><b>'+num(a.marks)+'</b><small>/ '+num(ex.total)+'</small><small>সময় '+mmss(a.timeSec)+'</small></div></div>'+
+    '<div class="stat3"><div class="tile"><b style="color:var(--good)">'+bn(a.correct)+'</b><span>সঠিক</span></div><div class="tile"><b style="color:var(--bad)">'+bn(a.wrong)+'</b><span>ভুল</span></div><div class="tile"><b>'+bn(a.blank)+'</b><span>উত্তর দেয়নি</span></div></div>'+
+    '<p class="calc">'+calcLine(a,ex)+'</p>'+
+    (d.hasAnswers?'':'<p class="note">এই উত্তরপত্রে প্রশ্নভিত্তিক উত্তর সংরক্ষিত নেই, তাই শুধু সঠিক উত্তরগুলো দেখানো হচ্ছে।</p>')+
+    '<h3 class="h2">প্রশ্ন ও শিক্ষার্থীর উত্তর</h3>'+reviewHtml(d.review,'শিক্ষার্থীর উত্তর','উত্তর দেয়নি',!d.hasAnswers)+'</div>');
+}
+function ovAdminExam(){
+  var o=S.overlay,ex=o.exam,del=S.armed==='del:'+ex.id;
+  var right='<span class="sp"></span>'+(del?chip('নিশ্চিত? আবার ট্যাপ করুন','bad'):'')+
+    '<button class="icon-btn del'+(del?' armed':'')+'" data-act="delExam" data-id="'+ex.id+'" aria-label="পরীক্ষা মুছুন">'+ico('trash',20)+'</button>';
+  return ovWrap(ovHead('পরীক্ষার বিবরণ','close',right)+'<div class="ov-body"><h2 class="h1 sm">'+esc(ex.title)+'</h2><div class="chips">'+chip(esc(ex.className))+chip(bn(ex.qCount)+'টি প্রশ্ন','mute')+chip(bn(ex.duration)+' মিনিট','mute')+chip('জমা '+bn(ex.attempts),'mute')+(ex.bonus>0?chip('অতিরিক্ত +'+num(ex.bonus),'good'):'')+'</div>'+
+    '<p class="meta">প্রতি সঠিক উত্তরে '+num(ex.perQ)+' নম্বর · ভুল উত্তরে −'+num(ex.neg)+' · পূর্ণমান '+num(ex.total)+(ex.bonus>0?' ('+num(ex.base)+' + অতিরিক্ত '+num(ex.bonus)+')':'')+'</p>'+
+    (ex.attempts?'<button class="btn primary block" data-act="review" data-id="'+ex.id+'">ফলাফল পর্যালোচনা</button>':'')+
+    o.questions.map(function(q,i){return '<div class="card"><span class="qn">প্রশ্ন '+bn(i+1)+'</span><p class="qtext sm">'+esc(q.q)+'</p>'+q.opts.map(function(t,j){return '<div class="ro '+(j===q.ans?'ok':'')+'"><span class="bubble sm">'+LET[j]+'</span><span>'+esc(t)+'</span>'+(j===q.ans?'<span class="tag">সঠিক উত্তর</span>':'')+'</div>';}).join('')+'</div>';}).join('')+'</div>');
+}
+function ovEditor(){
+  var d=S.draft,cls=S.classes;
+  return ovWrap(ovHead('নতুন পরীক্ষা')+'<div class="ov-body">'+
+    '<div class="field"><label for="ed-title">পরীক্ষার নাম</label><input id="ed-title" value="'+esc(d.title)+'" placeholder="যেমন: পদার্থবিজ্ঞান – অধ্যায় ২"></div>'+
+    '<div class="field"><label for="ed-class">শ্রেণি</label><select id="ed-class">'+cls.map(function(c){return '<option value="'+c.id+'"'+(c.id===d.classId?' selected':'')+'>'+esc(c.name)+'</option>';}).join('')+'</select></div>'+
+    '<div class="facts"><div class="field"><label for="ed-dur">সময় (মিনিট)</label><input id="ed-dur" inputmode="numeric" value="'+esc(d.duration)+'"></div>'+
+    '<div class="field"><label for="ed-perq">প্রতি প্রশ্ন</label><input id="ed-perq" inputmode="decimal" value="'+esc(d.perQ)+'"></div>'+
+    '<div class="field"><label for="ed-neg">ভুলে কাটা</label><input id="ed-neg" inputmode="decimal" value="'+esc(d.neg)+'"></div></div>'+
+    d.questions.map(function(q,i){
+      return '<div class="card q-ed"><div class="rv-h"><span class="qn">প্রশ্ন '+bn(i+1)+'</span>'+(d.questions.length>1?'<button class="link" data-act="edRemove" data-i="'+i+'">বাদ দিন</button>':'')+'</div>'+
+        '<div class="field"><label for="ed-q-'+i+'">প্রশ্ন</label><textarea id="ed-q-'+i+'">'+esc(q.q)+'</textarea></div>'+
+        q.opts.map(function(o,j){return '<div class="field"><label for="ed-o-'+i+'-'+j+'">অপশন '+LET[j]+'</label><input id="ed-o-'+i+'-'+j+'" value="'+esc(o)+'"></div>';}).join('')+
+        '<div class="field"><label for="ed-a-'+i+'">সঠিক উত্তর</label><select id="ed-a-'+i+'">'+LET.map(function(l,j){return '<option value="'+j+'"'+(q.ans===j?' selected':'')+'>'+l+'</option>';}).join('')+'</select></div></div>';
+    }).join('')+
+    '<button class="btn ghost block" data-act="edAdd">'+ico('plus',18)+' আরেকটি প্রশ্ন যোগ করুন</button></div>'+
+    '<div class="ov-foot"><button class="btn primary block" data-act="edSave">পরীক্ষা সংরক্ষণ করুন</button></div>');
+}
+function ovSection(){
+  var d=S.overlay.d;
+  return ovWrap(ovHead(esc(d.className)+' · '+esc(d.section)+' শাখা')+'<div class="ov-body"><div class="grid2"><div class="tile"><b>'+bn(d.students.length)+'</b><span>শিক্ষার্থী</span></div><div class="tile"><b>'+bn(d.examCount)+'</b><span>এই শ্রেণির পরীক্ষা</span></div></div>'+
+    '<h3 class="h2">শিক্ষার্থীদের তালিকা</h3>'+
+    (d.students.length?d.students.map(function(s){
+      var left=d.examCount-s.taken;
+      var st=!d.examCount?'':(left>0?chip('বাকি '+bn(left),'warn'):chip('সব দিয়েছে','good'));
+      return '<button class="secrow" data-act="openStudent" data-id="'+s.id+'"><span class="bubble" aria-hidden="true">'+esc(s.name.charAt(0))+'</span><span class="who"><b>'+esc(s.name)+'</b><small>রোল '+bn(esc(s.roll))+' · দিয়েছে '+bn(s.taken)+'/'+bn(d.examCount)+'</small></span>'+st+'<span class="chev">'+ico('chev',20)+'</span></button>';
+    }).join(''):empty('এই শাখায় এখনো কোনো শিক্ষার্থী নেই।'))+'</div>');
+}
+/* a taken exam opens the student's answer sheet; one not taken stays a plain card */
+function repCard(e,sid){
+  var st=e.taken?chip('দিয়েছে','good'):(e.published?chip('দেয়নি','bad'):chip('এখনো দেয়নি','warn'));
+  var body=e.taken?
+    '<div class="scoreline"><b>'+num(e.marks)+'</b> / '+num(e.total)+' নম্বর<span>অবস্থান '+ord(e.rank)+' / '+bn(e.participants)+'</span></div><div class="chips">'+chip('সঠিক '+bn(e.correct),'good')+chip('ভুল '+bn(e.wrong),'bad')+chip('বাকি '+bn(e.blank),'mute')+chip('সময় '+mmss(e.timeSec),'mute')+(e.bonus>0?chip('অতিরিক্ত +'+num(e.bonus),'good'):'')+(e.published?'':chip('ফলাফল অপ্রকাশিত','warn'))+'</div><span class="go">উত্তরপত্র দেখুন '+ico('chev',18)+'</span>':
+    '<p class="meta">'+(e.published?'এই পরীক্ষায় অংশ নেয়নি।':'এখনো উত্তরপত্র জমা দেয়নি।')+' পূর্ণমান '+num(e.total)+'</p>';
+  var head='<div class="exam-h"><h3>'+esc(e.title)+'</h3>'+st+'</div>'+body;
+  return e.taken?'<button class="card exam cardbtn" data-act="openAttempt" data-eid="'+e.id+'" data-uid="'+sid+'">'+head+'</button>':'<div class="card exam">'+head+'</div>';
+}
+function enrollCard(s){
+  var cl=S.overlay.classes||[],cur=cl.filter(function(c){return c.id===s.classId;})[0]||{sections:[]};
+  return '<form class="card" data-form="enroll" data-id="'+s.id+'"><h3 class="h2">শ্রেণি ও শাখা বদলান</h3><div class="stu-sel"><select name="classId" aria-label="শ্রেণি" data-chg="enrClass">'+
+    cl.map(function(c){return '<option value="'+c.id+'"'+(c.id===s.classId?' selected':'')+'>'+esc(c.name)+'</option>';}).join('')+'</select><select name="section" aria-label="শাখা">'+
+    cur.sections.map(function(x){return '<option'+(x===s.section?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'</select></div><button class="btn ghost" type="submit">সংরক্ষণ করুন</button></form>';
+}
+function ovStuReport(){
+  var r=S.overlay.r,s=r.student,m=r.summary;
+  return ovWrap(ovHead('শিক্ষার্থীর বিবরণ','stuBack')+'<div class="ov-body"><div class="card"><div class="exam-h"><div><h2 class="h1 sm">'+esc(s.name)+'</h2><p class="meta">রোল '+bn(esc(s.roll))+'</p></div><span class="bubble lg fill" aria-hidden="true">'+esc(s.name.charAt(0))+'</span></div>'+
+    '<div class="chips">'+chip(esc(s.className))+chip(esc(s.section)+' শাখা','mute')+'</div><p class="meta">ফোন: '+(s.phone?bn(esc(s.phone)):'দেওয়া নেই')+'</p></div>'+enrollCard(s)+
+    '<div class="tiles"><div class="tile"><b style="color:var(--good)">'+bn(m.taken)+'</b><span>পরীক্ষা দিয়েছে</span></div><div class="tile '+(m.missed?'warn':'')+'"><b>'+bn(m.missed)+'</b><span>দেয়নি</span></div><div class="tile"><b>'+num(m.marks)+'</b><span>/ '+num(m.full)+' নম্বর</span></div></div>'+
+    '<h3 class="h2">পরীক্ষাভিত্তিক ফলাফল</h3><p class="meta">দেওয়া পরীক্ষায় ট্যাপ করলে প্রশ্নভিত্তিক উত্তর দেখা যাবে।</p>'+(r.exams.length?r.exams.map(function(e){return repCard(e,s.id);}).join(''):empty('এই শ্রেণির জন্য এখনো কোনো পরীক্ষা নেই।'))+'</div>');
+}
+function viewOverlay(){
+  var o=S.overlay;if(!o)return '';
+  return ({intro:ovIntro,exam:ovExam,submitted:ovSubmitted,result:ovResult,settings:ovSettings,apilog:ovApiLog,review:ovReview,attempt:ovAttempt,adminExam:ovAdminExam,editor:ovEditor,section:ovSection,stuReport:ovStuReport}[o.type]||function(){return '';})();
+}
+
+function render(){
+  var app=document.getElementById('app');
+  var m=app.querySelector('.main'),mt=m?m.scrollTop:0;
+  var ob=app.querySelector('.ov-body'),ot=ob?ob.scrollTop:0,prevType=S._ovType;
+  app.className=S.user?'shell':'authwrap';
+  app.innerHTML=(S.user?viewShell():viewAuth())+viewOverlay();
+  var m2=app.querySelector('.main');if(m2)m2.scrollTop=mt;
+  var ob2=app.querySelector('.ov-body');
+  var curType=S.overlay?S.overlay.type:null;
+  if(ob2&&prevType===curType)ob2.scrollTop=ot;
+  S._ovType=curType;
+}
+
+/* ---------- data loading ---------- */
+async function loadTab(){
+  var tk=++S.tk,t=S.tab;
+  try{
+    var d=null;
+    if(t==='home'||t==='results'){S.user=await api('GET','/api/me');d={exams:await api('GET','/api/exams')};}
+    else if(t==='board'){
+      var exams=await api('GET','/api/exams');
+      var pubs=exams.filter(function(e){return e.published;}).sort(function(a,b){return b.pubSeq-a.pubSeq;});
+      if(!pubs.some(function(e){return e.id===S.boardId;}))S.boardId=pubs[0]?pubs[0].id:null;
+      d={exams:exams,board:(S.boardMode==='exam'&&S.boardId)?await api('GET','/api/exams/'+S.boardId+'/leaderboard'):null,overall:(S.boardMode==='overall'&&pubs.length)?await api('GET','/api/leaderboard/overall'):null};
+    }
+    else if(t==='profile'){S.user=await api('GET','/api/me');d={};}
+    else if(t==='dash')d=await api('GET','/api/admin/summary');
+    else if(t==='exams')d={exams:await api('GET','/api/admin/exams')};
+    else if(t==='students')d={students:await api('GET','/api/admin/students'),classes:await api('GET','/api/classes')};
+    else if(t==='classes')d={classes:await api('GET','/api/classes')};
+    if(tk!==S.tk)return;
+    S.data=d;render();
+  }catch(e){
+    if(tk!==S.tk)return;
+    toast(e.message,'bad');
+    if(e.status===401){S.user=null;render();}
+  }
+}
+function go(t){S.tab=t;S.data=null;render();loadTab();}
+var refresh=function(){return loadTab();};
+function errToast(e){toast(e.message||'কিছু একটা সমস্যা হয়েছে','bad');}
+
+async function doLogin(roll,pw){
+  try{
+    S.user=await api('POST','/api/auth/login',{roll:roll,password:pw});
+    S.tab=S.user.role==='admin'?'dash':'home';S.data=null;S.overlay=null;render();loadTab();
+  }catch(e){errToast(e);}
+}
+
+/* exam flow */
+async function openIntro(id){
+  try{var paper=await api('GET','/api/exams/'+id+'/paper');S.overlay={type:'intro',paper:paper};render();}
+  catch(e){errToast(e);refresh();}
+}
+function startExam(){
+  var p=S.overlay.paper,now=Date.now();
+  S.ex={paper:p,idx:0,answers:p.questions.map(function(){return null;}),confirm:false,busy:false,startedAt:now,endAt:now+p.duration*60000,rem:p.duration*60};
+  S.overlay={type:'exam'};render();
+  clearInterval(S.tm);S.tm=setInterval(tick,500);
+}
+function tick(){
+  var x=S.ex;if(!x)return;
+  var rem=Math.max(0,Math.ceil((x.endAt-Date.now())/1000));x.rem=rem;
+  var el=document.getElementById('timer');
+  if(el){el.textContent=mmss(rem);el.classList.toggle('low',rem<=60);}
+  if(rem<=0&&!x.busy)submitExam(true);
+}
+async function submitExam(auto){
+  var x=S.ex;if(!x||x.busy)return;
+  x.busy=true;x.confirm=false;clearInterval(S.tm);
+  var timeSec=Math.min(x.paper.duration*60,Math.max(1,Math.round((Date.now()-x.startedAt)/1000)));
+  try{
+    await api('POST','/api/exams/'+x.paper.id+'/submit',{answers:x.answers,timeSec:timeSec});
+    S.overlay={type:'submitted',title:x.paper.title,timeSec:timeSec,auto:!!auto};S.ex=null;render();refresh();
+  }catch(e){errToast(e);S.ex=null;S.overlay=null;render();refresh();}
+}
+async function openResult(id){
+  try{var r=await api('GET','/api/results/'+id);S.overlay={type:'result',r:r};render();}catch(e){errToast(e);}
+}
+async function openReview(id){
+  try{var b=await api('GET','/api/exams/'+id+'/leaderboard');S.overlay={type:'review',b:b};render();}catch(e){errToast(e);}
+}
+async function openAdminExam(id){
+  try{var d=await api('GET','/api/admin/exams/'+id);S.armed=null;S.overlay={type:'adminExam',exam:d.exam,questions:d.questions};render();}catch(e){errToast(e);}
+}
+
+/* editor */
+var blankQ=function(){return {q:'',opts:['','','',''],ans:0};};
+function capture(){
+  var d=S.draft;if(!d)return;
+  var g=function(id){return document.getElementById(id);};
+  if(!g('ed-title'))return;
+  d.title=g('ed-title').value;d.classId=g('ed-class').value;d.duration=g('ed-dur').value;d.perQ=g('ed-perq').value;d.neg=g('ed-neg').value;
+  d.questions.forEach(function(q,i){
+    q.q=g('ed-q-'+i).value;
+    q.opts=q.opts.map(function(_,j){return g('ed-o-'+i+'-'+j).value;});
+    q.ans=+g('ed-a-'+i).value;
+  });
+}
+async function openEditor(){
+  try{
+    S.classes=await api('GET','/api/classes');
+    S.draft={title:'',classId:S.classes[0].id,duration:'5',perQ:'1',neg:'0.25',questions:[blankQ()]};
+    S.overlay={type:'editor'};render();
+  }catch(e){errToast(e);}
+}
+async function saveExam(){
+  capture();var d=S.draft;
+  var body={title:d.title,classId:d.classId,duration:parseInt(asc(d.duration),10),perQ:parseFloat(asc(d.perQ)),neg:parseFloat(asc(d.neg)||'0'),questions:d.questions};
+  try{await api('POST','/api/exams',body);S.overlay=null;S.draft=null;render();toast('পরীক্ষা তৈরি হয়েছে','good');refresh();}
+  catch(e){errToast(e);}
+}
+
+/* ---------- events ---------- */
+var A={
+  demoStudent:function(){doLogin('250112','1234');},
+  demoAdmin:function(){doLogin('admin','admin');},
+  authMode:function(t){S.authMode=t.dataset.m;render();},
+  tab:function(t){go(t.dataset.tab);},
+  intro:function(t){openIntro(t.dataset.id);},
+  startExam:startExam,
+  pick:function(t){var x=S.ex,j=+t.dataset.j;x.answers[x.idx]=x.answers[x.idx]===j?null:j;render();},
+  qnav:function(t){S.ex.idx=+t.dataset.i;render();},
+  prev:function(){if(S.ex.idx>0){S.ex.idx--;render();}},
+  next:function(){if(S.ex.idx<S.ex.paper.questions.length-1){S.ex.idx++;render();}},
+  askSubmit:function(){S.ex.confirm=true;render();},
+  cancelSubmit:function(){S.ex.confirm=false;render();},
+  doSubmit:function(){submitExam(false);},
+  close:function(){S.overlay=null;S.armed=null;render();refresh();},
+  result:function(t){openResult(t.dataset.id);},
+  toBoard:function(t){S.boardMode='exam';S.boardId=t.dataset.id;S.overlay=null;S.tab='board';S.data=null;render();loadTab();},
+  boardMode:function(t){S.boardMode=t.dataset.m;S.data=null;render();loadTab();},
+  openSection:async function(t){
+    try{var d=await api('GET','/api/admin/classes/'+t.dataset.cid+'/sections/'+encodeURIComponent(t.dataset.sec)+'/students');S.overlay={type:'section',d:d};render();}catch(e){errToast(e);}
+  },
+  openStudent:async function(t){
+    try{
+      var r=await api('GET','/api/admin/students/'+t.dataset.id+'/report'),cl=await api('GET','/api/classes');
+      S.overlay={type:'stuReport',r:r,classes:cl,from:S.overlay&&S.overlay.type==='section'?S.overlay:null};render();
+    }catch(e){errToast(e);}
+  },
+  stuBack:function(){var f=S.overlay.from;S.overlay=f||null;render();if(!f)refresh();},
+  /* open one student's answer sheet from the review list or from a student's report; "back" returns to where it was opened */
+  openAttempt:async function(t){
+    try{
+      var d=await api('GET','/api/admin/exams/'+t.dataset.eid+'/attempts/'+t.dataset.uid);
+      S.overlay={type:'attempt',d:d,from:S.overlay};render();
+    }catch(e){errToast(e);}
+  },
+  attBack:function(){var f=S.overlay.from;S.overlay=f||null;render();if(!f)refresh();},
+  boardSel:function(t){S.boardId=t.dataset.id;S.data=null;render();loadTab();},
+  review:function(t){openReview(t.dataset.id);},
+  publish:async function(t){
+    try{await api('POST','/api/exams/'+t.dataset.id+'/publish');toast('ফলাফল প্রকাশিত হয়েছে','good');await openReview(t.dataset.id);refresh();}catch(e){errToast(e);}
+  },
+  unpublish:async function(t){
+    try{await api('DELETE','/api/exams/'+t.dataset.id+'/publish');toast('প্রকাশ প্রত্যাহার করা হয়েছে');await openReview(t.dataset.id);refresh();}catch(e){errToast(e);}
+  },
+  adminExam:function(t){openAdminExam(t.dataset.id);},
+  delExam:async function(t){
+    var key='del:'+t.dataset.id;
+    if(S.armed!==key){S.armed=key;render();return;}
+    try{await api('DELETE','/api/exams/'+t.dataset.id);S.armed=null;S.overlay=null;render();toast('পরীক্ষা মুছে ফেলা হয়েছে');refresh();}catch(e){errToast(e);}
+  },
+  newExam:openEditor,
+  edAdd:function(){capture();S.draft.questions.push(blankQ());render();setTimeout(function(){var b=document.querySelector('.ov-body');if(b)b.scrollTop=b.scrollHeight;},0);},
+  edRemove:function(t){capture();S.draft.questions.splice(+t.dataset.i,1);render();},
+  edSave:saveExam,
+  settings:function(){S.armed=null;S.overlay={type:'settings'};render();},
+  apilog:function(){S.overlay={type:'apilog'};render();},
+  reset:async function(){
+    if(S.armed!=='reset'){S.armed='reset';render();return;}
+    try{await api('POST','/api/dev/reset');}catch(e){}
+    apiLog=[];S.user=null;S.overlay=null;S.armed=null;S.data=null;S.authMode='login';S.boardId=null;
+    try{S.classes=await api('GET','/api/classes');}catch(e){}
+    render();toast('ডেমো ডেটা আগের অবস্থায় ফিরেছে','good');
+  },
+  logout:async function(){
+    try{await api('POST','/api/auth/logout');}catch(e){}
+    S.user=null;S.overlay=null;S.data=null;S.armed=null;S.authMode='login';render();
+  }
+};
+var FORMS={
+  login:function(f){doLogin(f.elements.roll.value,f.elements.password.value);},
+  register:async function(f){
+    var v=function(n){return f.elements[n].value;};
+    try{
+      S.user=await api('POST','/api/auth/register',{name:v('name'),roll:v('roll'),password:v('password'),classId:v('classId'),section:v('section')});
+      S.tab='home';S.data=null;render();toast('অ্যাকাউন্ট তৈরি হয়েছে','good');loadTab();
+    }catch(e){errToast(e);}
+  },
+  profile:async function(f){
+    try{S.user=await api('PATCH','/api/users/me',{name:f.elements.name.value,phone:f.elements.phone.value});render();toast('প্রোফাইল সংরক্ষিত হয়েছে','good');}catch(e){errToast(e);}
+  },
+  bonus:async function(f){
+    var raw=asc(f.elements.bonus.value).trim()||'0',v=Number(raw);
+    if(!Number.isFinite(v)){toast('অতিরিক্ত নম্বর হিসেবে একটি সংখ্যা লিখুন','bad');return;}
+    try{
+      var res=await api('POST','/api/exams/'+f.dataset.id+'/bonus',{bonus:v});
+      await openReview(f.dataset.id);
+      toast(res.bonus>0?'সবাইকে '+num(res.bonus)+' নম্বর অতিরিক্ত দেওয়া হয়েছে':'অতিরিক্ত নম্বর বাদ দেওয়া হয়েছে','good');
+      refresh();
+    }catch(e){errToast(e);}
+  },
+  enroll:async function(f){
+    try{
+      await api('PATCH','/api/students/'+f.dataset.id+'/enrollment',{classId:f.elements.classId.value,section:f.elements.section.value});
+      var o=S.overlay;o.r=await api('GET','/api/admin/students/'+f.dataset.id+'/report');o.from=null;render();toast('শ্রেণি ও শাখা বদলানো হয়েছে','good');
+    }catch(e){errToast(e);}
+  },
+  newClass:async function(f){
+    try{await api('POST','/api/classes',{name:f.elements.name.value});toast('শ্রেণি যোগ হয়েছে','good');refresh();}catch(e){errToast(e);}
+  },
+  addSection:async function(f){
+    try{await api('POST','/api/classes/'+f.dataset.id+'/sections',{name:f.elements.name.value});toast('শাখা যোগ হয়েছে','good');refresh();}catch(e){errToast(e);}
+  }
+};
+var CHG={
+  regClass:function(t){
+    var c=S.classes.filter(function(x){return x.id===t.value;})[0];
+    t.form.elements.section.innerHTML=c.sections.map(function(s){return '<option>'+esc(s)+'</option>';}).join('');
+  },
+  enrClass:function(t){
+    var c=S.overlay.classes.filter(function(x){return x.id===t.value;})[0];
+    t.form.elements.section.innerHTML=c.sections.map(function(x){return '<option>'+esc(x)+'</option>';}).join('');
+  }
+};
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');
+  if(!t||t.disabled)return;
+  var f=A[t.dataset.act];if(f)f(t,e);
+});
+document.addEventListener('keydown',function(e){
+  var x=S.ex;if(!x||!S.overlay||S.overlay.type!=='exam'||x.confirm||e.ctrlKey||e.metaKey||e.altKey)return;
+  var t=e.target&&e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT')return;
+  var n=x.paper.questions.length,k=e.key,j=-1;
+  if(k>='1'&&k<='4')j=+k-1;
+  else{var m=asc(k);if(m>='1'&&m<='4')j=+m-1;}
+  if(j>=0&&j<x.paper.questions[x.idx].opts.length){x.answers[x.idx]=x.answers[x.idx]===j?null:j;render();e.preventDefault();}
+  else if(k==='ArrowRight'&&x.idx<n-1){x.idx++;render();e.preventDefault();}
+  else if(k==='ArrowLeft'&&x.idx>0){x.idx--;render();e.preventDefault();}
+});
+document.addEventListener('submit',function(e){
+  var f=e.target.closest('form[data-form]');if(!f)return;
+  e.preventDefault();var h=FORMS[f.dataset.form];if(h)h(f);
+});
+document.addEventListener('change',function(e){
+  var t=e.target;if(t.dataset&&t.dataset.chg&&CHG[t.dataset.chg])CHG[t.dataset.chg](t);
+});
+document.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.id==='stuSearch'){
+    var v=asc(t.value).trim().toLowerCase();
+    var shown=0;
+    document.querySelectorAll('.stu').forEach(function(el){var h=!!v&&el.dataset.s.indexOf(v)<0;el.hidden=h;if(!h)shown++;});
+    var ns=document.getElementById('noStu');if(ns)ns.hidden=shown>0;
+  }
+});
+
+async function init(){
+  loadDb();
+  try{S.classes=await api('GET','/api/classes');}catch(e){}
+  if(session){
+    try{S.user=await api('GET','/api/me');S.tab=S.user.role==='admin'?'dash':'home';}catch(e){S.user=null;}
+  }
+  render();
+  if(S.user)loadTab();
+}
+init();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+})();
+</script>
+
+</body></html>
